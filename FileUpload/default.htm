@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Segmentos COI</title>
+  <meta name="description" content="Signature Pad - HTML5 canvas based smooth signature drawing using variable width spline interpolation.">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <link rel="stylesheet" href="css/style.css">
+
+  <!--[if IE]>
+    <link rel="stylesheet" type="text/css" href="css/ie9.css">
+  <![endif]-->
+
+  <script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+
+  <script src="js/md5.min.js"></script>
+
+  
+</head>
+<body onselectstart="return false">
+
+	<div id="signature-pad"" class="signature-pad ">
+		<input id="file" type="file" />
+		
+		<input id="bEnviar" type="button" value="enviar" />
+	<div>
+ 
+ 
+ 
+	<script>
+	
+	function getBase64(file,finish) {
+		var reader = new FileReader();
+		
+		reader.readAsDataURL(file);
+		
+		reader.onload = function () {
+			finish(reader.result)
+		};
+   
+		reader.onerror = function (error) {
+			console.log('Error: ', error);
+		};
+	}
+
+	document.getElementById("bEnviar").addEventListener("click", function (event) {
+		 var files = document.getElementById('file').files;
+		if (files.length > 0) {
+			getBase64(files[0],finish);
+		}
+	});
+	
+	function finish(base64File){
+
+		
+		/*
+		$.post("http://localhost:50443/huellas/dto", { "nombreFichero": "John", "fechaFichero": (new Date()).toJSON(), "hash": getMD5(base64File), "stream" : getB64Data(base64File), "contentType": getContentType(base64File)})
+		.done(function( data ) {
+			alert( "Data Loaded: " + data );
+		});
+		*/
+	
+		$.ajax({
+            url: "http://localhost:50443/huellas/dto",
+            type: "POST",
+			contentType: "application/json",
+            crossDomain: true,
+            data: JSON.stringify({ "nombreFichero": "John", "fechaFichero": (new Date()).toJSON(), "hash": getMD5(base64File), "stream" : getB64Data(base64File), "contentType": getContentType(base64File)}),
+			dataType: "json",
+            success: function (response) {
+               // var resp = JSON.parse(response)
+				alert(response.status);
+            },
+            error: function (xhr, status) {
+                alert(status );
+            }
+        });
+	
+	
+	
+	}
+	
+	function dataURLToBlob(dataURL) {
+		// Code taken from https://github.com/ebidel/filer.js
+		var parts = dataURL.split(';base64,');
+		var contentType = parts[0].split(":")[1];
+		var raw = window.atob(parts[1]);
+		var rawLength = raw.length;
+		var uInt8Array = new Uint8Array(rawLength);
+
+		for (var i = 0; i < rawLength; ++i) {
+			uInt8Array[i] = raw.charCodeAt(i);
+		}
+		return new Blob([uInt8Array], { type: contentType });
+	}
+	
+	
+	
+	function getMD5(dataURL){
+
+		var raw = window.atob(getB64Data(dataURL));
+		var rawLength = raw.length;
+
+		var uInt8Array = new Uint8Array(rawLength);
+
+		for (var i = 0; i < rawLength; ++i) {
+			uInt8Array[i] = raw.charCodeAt(i);
+		}
+			
+		return md5.base64(uInt8Array);
+	}
+	
+	
+	function getContentType(dataURL){
+		var parts = dataURL.split(';base64,');
+		return parts[0].split(":")[1];
+	}
+	
+	function getB64Data(dataURL){
+		var parts = dataURL.split(';base64,');
+		return parts[1];
+	}
+	
+	
+	
+	</script>
+<body>
+</html>
