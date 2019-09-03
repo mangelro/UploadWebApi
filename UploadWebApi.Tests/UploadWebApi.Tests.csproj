@@ -42,6 +42,9 @@
     <Reference Include="Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions">
       <HintPath>..\..\..\..\NuGetRepository\MSTest.TestFramework.1.2.0\lib\net45\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll</HintPath>
     </Reference>
+    <Reference Include="ProcessRunner, Version=1.0.4.18316, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\NuGetRepository\ProcessRunner.1.0.8\lib\net40\ProcessRunner.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />

@@ -106,11 +106,10 @@ namespace UploadWebApi.Controllers
                         file.Write(dto.Stream, 0, dto.Stream.Length);
 
                     }
-
-                    return await Task.FromResult(Ok(new { status = "HOLA" }));
+                    return await Task.FromResult(Created("", new { status = "HOLA" }));
                 }
                 else
-                    return await Task.FromResult(BadRequest());
+                    return await Task.FromResult(BadRequest(""));
 
             }catch (Exception ex)
             {

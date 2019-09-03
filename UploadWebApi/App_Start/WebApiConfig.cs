@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Formatting;
+﻿using System.Net.Http.Formatting;
 using System.Web.Http;
+using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
@@ -12,6 +10,11 @@ namespace UploadWebApi
     {
         public static void Register(HttpConfiguration config)
         {
+
+            config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType)); //El HostAuthenticationFilter clase habilita la autenticación con tokens de portador.
+
+
+
 
             config.Formatters.Clear();
             config.Formatters.Add(new JsonMediaTypeFormatter());
