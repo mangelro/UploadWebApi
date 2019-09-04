@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Segmentos COI</title>
+  <title>UPLOAD</title>
   <meta name="description" content="Signature Pad - HTML5 canvas based smooth signature drawing using variable width spline interpolation.">
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,6 +14,16 @@
     <link rel="stylesheet" type="text/css" href="css/ie9.css">
   <![endif]-->
 
+  <style>
+	input[type=file]
+	{
+		display:block;
+		margin:10px 0;
+	}
+  </style>
+  
+  
+  
   <script
   src="https://code.jquery.com/jquery-3.4.1.min.js"
   integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
@@ -26,8 +36,10 @@
 <body onselectstart="return false">
 
 	<div id="signature-pad"" class="signature-pad ">
-		<input id="file" type="file" />
-		
+		<div id="files">
+			<input id="file1" type="file" />
+		</div>
+		<input id="bMas" type="button" value="Add fichero" />
 		<input id="bEnviar" type="button" value="enviar" />
 	<div>
  
@@ -35,43 +47,58 @@
  
 	<script>
 	
-	function getBase64(file,finish) {
+		
+	document.getElementById("bEnviar").addEventListener("click", function (event) {
+		 var files = $('input[type=file]')[0].files;
+		if (files.length > 0) {
+			readFileBase64(files[0],readFinished);
+		}
+	});
+		
+	document.getElementById("bMas").addEventListener("click", function (event) {
+		 var file = document.createElement("INPUT");  // Create with DOM
+			file.type = "file";
+			
+			$("#files").append(file);
+		
+		
+	});
+		
+	function readFileBase64(file,finishCallback) {
 		var reader = new FileReader();
 		
 		reader.readAsDataURL(file);
 		
 		reader.onload = function () {
-			finish(reader.result)
+			finishCallback(reader.result, file.name);
 		};
    
 		reader.onerror = function (error) {
 			console.log('Error: ', error);
 		};
 	}
-
-	document.getElementById("bEnviar").addEventListener("click", function (event) {
-		 var files = document.getElementById('file').files;
-		if (files.length > 0) {
-			getBase64(files[0],finish);
-		}
-	});
-	
-	function finish(base64File){
-
 		
-		/*
-		$.post("http://localhost:50443/huellas/dto", { "nombreFichero": "John", "fechaFichero": (new Date()).toJSON(), "hash": getMD5(base64File), "stream" : getB64Data(base64File), "contentType": getContentType(base64File)})
-		.done(function( data ) {
-			alert( "Data Loaded: " + data );
-		});
-		*/
+	function readFinished(base64File,nameFile){
+		
+		var requestData= JSON.stringify(
+			{ 
+				"idMuestra":"XX-23",
+				"nombreFichero": nameFile, 
+				"fechaAnalisis": (new Date()).toJSON(), 
+				"hash": getMD5(base64File), 
+				"contentType": getContentType(base64File),
+				"stream" : getB64Data(base64File), 
+			});
 	
 		$.ajax({
             url: "http://localhost:50443/huellas/dto",
             type: "POST",
 			contentType: "application/json",
             crossDomain: true,
-            data: JSON.stringify({ "nombreFichero": "John", "fechaFichero": (new Date()).toJSON(), "hash": getMD5(base64File), "stream" : getB64Data(base64File), "contentType": getContentType(base64File)}),
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader('authentication', 'Bearer mx4uGzCYs9S7KxT39STM3-14ZkhAsEs1N3uR6SGeAeAYh5N-nHyD6r8ssvUZKej3-BDdLX5luAKSq857Pbsn-DzQmFL5BQoZCKDP-vxKzZ3opwC8esx26Bx98xB_1ZSNuv1FirpZHkKPT2i-93dF5NbP_jdMImTgXDJS3XSk1xjB67aodasMnclLfAWIm2ou4Twx7sIxFVMOlC977Eie2q4AydDPfAI-CoWNiFcCMZ8Fv3McvX2Z0xjrrk06RbMPIgrsMw-RWVv-R9MVBcT2hynq4tfTmxe_PuGNxaxkwkb23QTlRORx0LQgdDESpXOJA8jXilXhxGUyolW1lgzdO12XDdh_7iKO6y-S1V5rrU-Pw7tPo8mQFHyD-75MR4CN1l3NigqhiDoWO5O9Vbpaz9d21ytljv9ye0N3DbAzgeX925nDgPgREuzfB4yBn4fTzCtMrBzqKDcw5hFIjhCNC-LHABaxy8H0OI5v4fXGUiE9LGMWsBj3lmKiqHLsTuIkwmqYkQ');
+			},			
+            data:requestData,
 			dataType: "json",
             success: function (response) {
                // var resp = JSON.parse(response)
@@ -99,9 +126,7 @@
 		}
 		return new Blob([uInt8Array], { type: contentType });
 	}
-	
-	
-	
+		
 	function getMD5(dataURL){
 
 		var raw = window.atob(getB64Data(dataURL));
@@ -115,8 +140,7 @@
 			
 		return md5.base64(uInt8Array);
 	}
-	
-	
+		
 	function getContentType(dataURL){
 		var parts = dataURL.split(';base64,');
 		return parts[0].split(":")[1];
@@ -126,8 +150,7 @@
 		var parts = dataURL.split(';base64,');
 		return parts[1];
 	}
-	
-	
+		
 	
 	</script>
 <body>

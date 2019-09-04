@@ -110,12 +110,23 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Applicacion\IHashService.cs" />
+    <Compile Include="Applicacion\Servicios\GestionHuellasService.cs" />
+    <Compile Include="Applicacion\Servicios\IConfiguracionRegistros.cs" />
+    <Compile Include="Applicacion\Servicios\MD5HashService.cs" />
+    <Compile Include="Applicacion\Servicios\ServiceException.cs" />
+    <Compile Include="Applicacion\Stores\DapperHuellasStore.cs" />
+    <Compile Include="Applicacion\Stores\IHuellasStore.cs" />
+    <Compile Include="Applicacion\Stores\IStoreConfiguration.cs" />
+    <Compile Include="Applicacion\Stores\StoreConfiguration .cs" />
     <Compile Include="App_Start\Startup.auth.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\FindController.cs" />
-    <Compile Include="Controllers\HuellasController.cs" />
+    <Compile Include="Controllers\GestionController.cs" />
     <Compile Include="Infraestructura\Serializacion\ByteArrayConverter.cs" />
-    <Compile Include="Models\UploadInfoDto.cs" />
+    <Compile Include="Models\HuellaDto.cs" />
+    <Compile Include="Models\GetHuellaDto.cs" />
+    <Compile Include="Models\InsertHuellaDto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>

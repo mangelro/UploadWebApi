@@ -46,7 +46,7 @@ namespace UploadWebApi.Infraestructura.Serializacion
 
         public override void WriteJson(JsonWriter writer, byte[] value, JsonSerializer serializer)
         {
-            throw new NotImplementedException();
+            writer.WriteRawValue(Convert.ToBase64String(value));
         }
     }
 }

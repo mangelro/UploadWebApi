@@ -17,16 +17,12 @@ namespace UploadWebApi.Models
     /// <summary>
     /// 
     /// </summary>
-    public class UploadInfoDto
+    public class HuellaDto
     {
-
+        public int IdHuella { get; set; }
         public string IdMuestra { get; set; }
         public DateTime FechaAnalisis { get; set; }
-
         public string NombreFichero { get; set; }
         public string Hash { get; set; }
-        [JsonConverter(typeof(ByteArrayConverter))]
-        public byte[] Stream { get; set; }
-        public string ContentType { get; set; }
     }
 }
