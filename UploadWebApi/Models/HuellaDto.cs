@@ -6,11 +6,6 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using UploadWebApi.Infraestructura.Serializacion;
 
 namespace UploadWebApi.Models
 {
@@ -21,8 +16,10 @@ namespace UploadWebApi.Models
     {
         public int IdHuella { get; set; }
         public string IdMuestra { get; set; }
-        public DateTime FechaAnalisis { get; set; }
+        public DateTime FechaHuella { get; set; }
         public string NombreFichero { get; set; }
         public string Hash { get; set; }
+        public Guid AppCliente { get; set; }
+        public Guid Propietario { get; set; }
     }
 }

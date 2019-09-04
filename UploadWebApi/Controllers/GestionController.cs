@@ -124,7 +124,7 @@ namespace UploadWebApi.Controllers
 
             var fileuploadPath = HttpContext.Current.Server.MapPath("~/App_Data");
 
-            var md5 = CalcularMD5(dto.Stream);
+            string md5 = "";
 
             try
             {

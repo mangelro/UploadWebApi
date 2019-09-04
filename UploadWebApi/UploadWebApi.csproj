@@ -43,6 +43,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Dapper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\NuGetRepository\Dapper.2.0.4\lib\netstandard2.0\Dapper.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Owin, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\NuGetRepository\Microsoft.Owin.4.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
@@ -69,6 +72,7 @@
     <Reference Include="System.Net.Http.Formatting, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\NuGetRepository\Microsoft.AspNet.WebApi.Client.5.2.7\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Web.Cors, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\NuGetRepository\Microsoft.AspNet.Cors.5.2.7\lib\net45\System.Web.Cors.dll</HintPath>
     </Reference>
@@ -124,6 +128,12 @@
     <Compile Include="Controllers\FindController.cs" />
     <Compile Include="Controllers\GestionController.cs" />
     <Compile Include="Infraestructura\Serializacion\ByteArrayConverter.cs" />
+    <Compile Include="Infraestructura\SqlBinaryStream\IBinaryData.cs" />
+    <Compile Include="Infraestructura\SqlBinaryStream\SqlBinaryData.cs" />
+    <Compile Include="Infraestructura\SqlBinaryStream\SqlBinaryInfo.cs" />
+    <Compile Include="Infraestructura\SqlBinaryStream\SqlBinaryMetaData.cs" />
+    <Compile Include="Infraestructura\SqlBinaryStream\SqlBinaryReader.cs" />
+    <Compile Include="Infraestructura\SqlBinaryStream\SqlBinaryWriter.cs" />
     <Compile Include="Models\HuellaDto.cs" />
     <Compile Include="Models\GetHuellaDto.cs" />
     <Compile Include="Models\InsertHuellaDto.cs" />

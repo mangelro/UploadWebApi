@@ -11,9 +11,9 @@ namespace UploadWebApi.Applicacion.Stores
     public interface IHuellasStore
     {
         HuellaDto Read(string idMuestra, Guid aplicacion);
-        void Create(HuellaDto huella);
+        Task CreateAsync(HuellaDto huella,byte[] huellaRaw);
         void Delete(int idHuella);
-        Stream ReadStream(int idHuella);
-        void WriteStream(int idHuella, Stream stream);
+        Task<byte[]> ReadHuellaRawAsync(int idHuella);
+        Task WriteHuellaRawAsync(int idHuella, byte[] buffer);
     }
 }
