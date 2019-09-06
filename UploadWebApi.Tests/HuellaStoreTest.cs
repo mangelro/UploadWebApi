@@ -11,7 +11,6 @@ namespace UploadWebApi.Tests
     [TestClass]
     public class HuellaStoreTest
     {
-        const string texto = "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.";
 
         readonly IStoreConfiguration _conf;
 
@@ -19,7 +18,7 @@ namespace UploadWebApi.Tests
         {
             var confMoq = new Mock<IStoreConfiguration>();
             confMoq.Setup(c => c.ConnectionString)
-                .Returns("Data Source=.\\SQLEXPRESS;Initial Catalog=INTERPANEL20;Integrated Security=false;User ID=INTERuser;Password=INTERpass!2pz;Application Name=interpanel");
+                .Returns("Data Source=IBMX3620\\IBMX3620;Initial Catalog=INTERPANEL20BAK;User ID=INTERuser;Password=INTERpass!2pz;Application Name=interpanel");
 
             _conf = confMoq.Object;
 
@@ -29,7 +28,7 @@ namespace UploadWebApi.Tests
         public async Task Crear_Huella_OK()
         {
 
-            var bytes = System.Text.Encoding.UTF8.GetBytes(texto);
+            var bytes = LeerFichero(@"C:\Users\miguel\Documents\Visual Studio 2017\Proyectos\UploadWebApi\UploadWebApi.Tests\ficheros\entrada.pdf");
             IHuellasStore store = new DapperHuellasStore(_conf);
 
             HuellaDto dto = new HuellaDto
@@ -43,22 +42,21 @@ namespace UploadWebApi.Tests
             };
 
 
-            await store.CreateAsync(dto,bytes);
+            await store.CreateAsync(dto, bytes);
 
         }
 
 
         [TestMethod]
-        public async Task Escribir_Stream_OK()
+        public async Task Escribir_Stream_Huella_OK()
         {
 
 
             IHuellasStore store = new DapperHuellasStore(_conf);
 
-            var bytes = System.Text.Encoding.UTF8.GetBytes(texto);
+            var bytes = LeerFichero("C:\\entrada.pdf");
 
-           await store.WriteHuellaRawAsync(1,bytes);
-            
+            await store.WriteHuellaRawAsync(1, bytes);
 
         }
 
@@ -66,19 +64,64 @@ namespace UploadWebApi.Tests
 
 
         [TestMethod]
-        public async Task Leer_Stream_OK()
+        public async Task Leer_Stream_Huella_OK()
         {
 
 
             IHuellasStore store = new DapperHuellasStore(_conf);
 
-            byte[] salida= await store.ReadHuellaRawAsync(3);
+            byte[] salida = await store.ReadHuellaRawAsync(10);
 
-            var text0 = System.Text.Encoding.UTF8.GetString(salida);
-
+            EscribirFichero(salida, @"C:\Users\miguel\Documents\Visual Studio 2017\Proyectos\UploadWebApi\UploadWebApi.Tests\ficheros\salida.pdf");
         }
 
 
+
+
+
+
+
+
+
+
+        void EscribirFichero(byte[] raw, string rutaFichero)
+        {
+            byte[] buffer = new byte[255];
+
+            int leidos=0;
+            using (var f = new FileStream(rutaFichero, FileMode.Create, FileAccess.Write))
+            {
+                using (var s = new MemoryStream(raw, 0, raw.Length, false))
+                {
+                    do
+                    {
+                        leidos = s.Read(buffer, 0, buffer.Length);
+                        f.Write(buffer, 0, leidos);
+                    } while (leidos == buffer.Length);
+                }
+            }
+        }
+
+        byte[] LeerFichero(string rutaFichero)
+        {
+
+            byte[] buffer = new byte[255];
+
+            int leidos = 0;
+            using (var s = new MemoryStream())
+            {
+                using (var f = new FileStream(rutaFichero, FileMode.Open, FileAccess.Read))
+                {
+                    do
+                    {
+                        leidos = f.Read(buffer, 0, buffer.Length);
+                        s.Write(buffer, 0, leidos);
+                    } while (leidos == buffer.Length);
+                }
+                return s.ToArray();
+            }
+
+        }
 
     }
 }

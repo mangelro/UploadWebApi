@@ -82,12 +82,30 @@ namespace UploadWebApi.Applicacion.Stores
             throw new NotImplementedException();
         }
 
-        public HuellaDto Read(string idMuestra, Guid aplicacion)
+        public async Task<HuellaDto> ReadAsync(string idMuestra, Guid aplicacion)
         {
-            throw new NotImplementedException();
+            string sqlString = @"SELECT
+                [IdHuella]
+                ,[IdMuestra]
+                ,[FechaHuella]
+                ,[NombreFichero]
+                ,[Hash]
+                ,[AppCliente]
+                ,[Propietario]
+                FROM [inter_HuellasAceite] 
+                WHERE IdMuestra=@IdMuestra AND AppCliente=@AppCliente";
+
+            using (var connection = new SqlConnection(_config.ConnectionString))
+            {
+                connection.Open();
+
+                var  dto= await connection.QueryFirstOrDefaultAsync<HuellaDto>(sqlString, new { IdMuestra = idMuestra, AppCliente = aplicacion });
+
+                return dto;
+            }
         }
 
-        public async Task<byte[]> ReadHuellaRawAsync(int idHuella)
+        public Task<byte[]> ReadHuellaRawAsync(int idHuella)
         {
 
             byte[] buffer = new byte[128];
@@ -105,20 +123,28 @@ namespace UploadWebApi.Applicacion.Stores
                         writer.Write(buffer, 0, leidos);
                     } while (leidos == buffer.Length);
                 }
-                return await Task.FromResult(writer.ToArray());
+                return  Task.FromResult(writer.ToArray());
             }
         }
 
         public async Task WriteHuellaRawAsync(int idHuella, byte[] huellaRaw)
         {
 
-            SqlBinaryData data = SqlBinaryData.CreateIntPrimaryKey(_config.ConnectionString, "inter_HuellasAceite", "Huella", idHuella, 128);
+            SqlBinaryData data = SqlBinaryData.CreateIntPrimaryKey(_config.ConnectionString, "inter_HuellasAceite", "Huella", idHuella, 1024);
 
-            using (var writer = data.OpenWrite(false))
+            byte[] buffer = new byte[512];
+            int leidos = 0;
+            using (var stream = new MemoryStream(huellaRaw, false))
             {
-                writer.Write(huellaRaw, 0, huellaRaw.Length);
+                using (var writer = data.OpenWrite(true))
+                {
+                    do
+                    {
+                        leidos=stream.Read(buffer, 0, buffer.Length);
+                        writer.Write(buffer, 0, leidos);
+                    } while (leidos == buffer.Length);
+                }
             }
-
             await Task.CompletedTask;
         }
 

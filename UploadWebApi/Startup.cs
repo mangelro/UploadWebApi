@@ -22,11 +22,9 @@ namespace UploadWebApi
             // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=316888
             var configuration = new HttpConfiguration();
 
-            //log4net.Config.XmlConfigurator.Configure();
 
             //Configurar AutoFac  
-            //AutofacWebapiConfig.Initialize(configuration, app);
-
+            AutofacWebapiConfig.Initialize(configuration, app);
 
 
             WebApiConfig.Register(configuration);

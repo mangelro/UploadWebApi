@@ -10,7 +10,7 @@ namespace UploadWebApi.Applicacion.Stores
 {
     public interface IHuellasStore
     {
-        HuellaDto Read(string idMuestra, Guid aplicacion);
+        Task<HuellaDto> ReadAsync(string idMuestra, Guid aplicacion);
         Task CreateAsync(HuellaDto huella,byte[] huellaRaw);
         void Delete(int idHuella);
         Task<byte[]> ReadHuellaRawAsync(int idHuella);
