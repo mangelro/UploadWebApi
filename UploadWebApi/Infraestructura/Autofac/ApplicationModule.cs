@@ -14,8 +14,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Autofac;
 using UploadWebApi.Applicacion;
+using UploadWebApi.Applicacion.Mapeado;
 using UploadWebApi.Applicacion.Servicios;
 using UploadWebApi.Applicacion.Stores;
+using UploadWebApi.Infraestructura.Mapeador;
+using UploadWebApi.Infraestructura.Servicios;
 
 namespace UploadWebApi.Infraestructura.Autofac
 {
@@ -30,6 +33,13 @@ namespace UploadWebApi.Infraestructura.Autofac
             builder.RegisterType<StoreConfiguration>()
                 .As<IStoreConfiguration>()
                 .InstancePerRequest();
+
+
+            //filtro para comprimir huellas --FakeCompresionService/ GZipCompresionService / SevenZipCompresionService
+            builder.RegisterType<GZipCompresionService>()
+                .As<IFiltroCompresion>()
+                .InstancePerRequest();
+
 
             //Stores de huellas
             builder.RegisterType<DapperHuellasStore>()
@@ -54,8 +64,20 @@ namespace UploadWebApi.Infraestructura.Autofac
             .InstancePerRequest();
 
 
+            //Servicio de Gestión de contrastes
+            builder.RegisterType<ContrasteHuellasService>()
+            .AsSelf()
+            .InstancePerRequest();
 
-            
+
+
+            //Servicio de Gestión de contrastes
+            builder.RegisterType<AutoMapperAdapter>()
+               .As<IMapperService>()
+               .InstancePerRequest();
+
+
+
 
         }
     }

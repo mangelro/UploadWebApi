@@ -8,11 +8,19 @@ using UploadWebApi.Models;
 
 namespace UploadWebApi.Applicacion.Stores
 {
+    public enum OrdenListatoTipo
+    {
+        ASC,
+        DESC,
+    }
+
     public interface IHuellasStore
     {
-        Task<HuellaDto> ReadAsync(string idMuestra, Guid aplicacion);
+
+        Task<Tuple<IEnumerable<HuellaDto>, int>> ReadAllAsync(int pageNumber, int pageSize, Guid idUsuario, Guid idAplicacion, OrdenListatoTipo orden = OrdenListatoTipo.DESC);
+        Task<HuellaDto> ReadAsync(string idMuestra, Guid idUsuario, Guid idAplicacion);
         Task CreateAsync(HuellaDto huella,byte[] huellaRaw);
-        void Delete(int idHuella);
+        Task DeleteAsync(int idHuella);
         Task<byte[]> ReadHuellaRawAsync(int idHuella);
         Task WriteHuellaRawAsync(int idHuella, byte[] buffer);
     }

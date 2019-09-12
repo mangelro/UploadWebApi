@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UploadWebApi", "UploadWebAp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UploadWebApi.Tests", "UploadWebApi.Tests\UploadWebApi.Tests.csproj", "{3268C482-F28C-4BE2-A9D7-CA087A2B992E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SevenZipCompresion", "..\SevenZipCompresion\SevenZipCompresion.csproj", "{CDC60859-9857-4E96-9821-67B890D9CC12}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{3268C482-F28C-4BE2-A9D7-CA087A2B992E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3268C482-F28C-4BE2-A9D7-CA087A2B992E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3268C482-F28C-4BE2-A9D7-CA087A2B992E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDC60859-9857-4E96-9821-67B890D9CC12}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{CDC60859-9857-4E96-9821-67B890D9CC12}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{CDC60859-9857-4E96-9821-67B890D9CC12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDC60859-9857-4E96-9821-67B890D9CC12}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

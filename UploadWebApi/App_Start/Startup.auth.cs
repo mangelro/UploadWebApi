@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Owin.Security.OAuth;
 using Owin;
-
+using UploadWebApi.Infraestructura.Web;
 
 namespace UploadWebApi
 {
@@ -26,27 +26,26 @@ namespace UploadWebApi
                 Provider = new OAuthBearerAuthenticationProvider
                 {
 
+                    //Permite localizar el token en el QueryString
                     OnRequestToken = (OAuthRequestTokenContext context) =>
-                   {
+                    {
 
-                       if (context.Request.QueryString.HasValue)
-                       {
-                           if (string.IsNullOrWhiteSpace(context.Request.Headers["Authorization"].ToString()))
-                           {
-                               var queryString = context.Request.QueryString.Value.ParseQuery();
+                        if (context.Request.QueryString.HasValue)
+                        {
+                            if (!context.Request.Headers.Keys.Contains("Authorization"))
+                            {
+                                var queryString = QueryStringHelper.ParseQuery(context.Request.QueryString.Value);
 
-                               var token = queryString["access_token"].ToString();
+                                var token = queryString["accesstoken"];
 
-                               if (!string.IsNullOrWhiteSpace(token))
-                               {
-                                   context.Request.Headers.Add("Authorization", new[] { $"Bearer {token}" });
-                               }
-                           }
+                                context.Token = token;
 
-                       }
+                            }
 
-                       return Task.FromResult<object>(null);
-                   }
+                        }
+
+                        return Task.FromResult<object>(null);
+                    }
 
                 },
 
@@ -60,100 +59,6 @@ namespace UploadWebApi
 
     }
 
-
-    static class QueryStringHelper
-    {
-        public static Dictionary<string, string> ParseQuery(string queryString)
-        {
-            var result = ParseNullableQuery(queryString);
-
-            if (result == null)
-            {
-                return new Dictionary<string, string>();
-            }
-
-            return result;
-        }
-
-
-
-        public static Dictionary<string, string> ParseNullableQuery(string queryString)
-        {
-
-
-
-
-
-
-            if (string.IsNullOrEmpty(queryString) || queryString == "?")
-            {
-                return null;
-            }
-
-
-        
-
-
-
-
-            int scanIndex = 0;
-            if (queryString[0] == '?')
-            {
-                scanIndex = 1;
-            }
-
-            int textLength = queryString.Length;
-            int equalIndex = queryString.IndexOf('=');
-            if (equalIndex == -1)
-            {
-                equalIndex = textLength;
-            }
-            while (scanIndex < textLength)
-            {
-                int delimiterIndex = queryString.IndexOf('&', scanIndex);
-                if (delimiterIndex == -1)
-                {
-                    delimiterIndex = textLength;
-                }
-                if (equalIndex < delimiterIndex)
-                {
-                    while (scanIndex != equalIndex && char.IsWhiteSpace(queryString[scanIndex]))
-                    {
-                        ++scanIndex;
-                    }
-                    string name = queryString.Substring(scanIndex, equalIndex - scanIndex);
-                    string value = queryString.Substring(equalIndex + 1, delimiterIndex - equalIndex - 1);
-
-                    accumulator.Append(
-                        Uri.UnescapeDataString(name.Replace('+', ' ')),
-                        Uri.UnescapeDataString(value.Replace('+', ' ')));
-
-                    equalIndex = queryString.IndexOf('=', delimiterIndex);
-
-                    if (equalIndex == -1)
-                    {
-                        equalIndex = textLength;
-                    }
-                }
-                else
-                {
-                    if (delimiterIndex > scanIndex)
-                    {
-                        accumulator.Append(queryString.Substring(scanIndex, delimiterIndex - scanIndex), string.Empty);
-                    }
-                }
-                scanIndex = delimiterIndex + 1;
-            }
-
-            if (!accumulator.HasValues)
-            {
-                return null;
-            }
-
-            return accumulator.GetResults();
-
-        }
-    }
 
 
 

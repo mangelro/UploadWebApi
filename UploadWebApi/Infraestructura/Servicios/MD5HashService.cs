@@ -12,8 +12,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UploadWebApi.Applicacion;
 
-namespace UploadWebApi.Applicacion.Servicios
+namespace UploadWebApi.Infraestructura.Servicios
 {
     /// <summary>
     /// 
@@ -27,6 +28,13 @@ namespace UploadWebApi.Applicacion.Servicios
             {
                 return md5.ComputeHash(buffer);
             }
+        }
+
+
+        public bool VerifyHash(string hashEsperado, byte[] raw)
+        {
+            string md5Actual = Convert.ToBase64String(CalcularHash(raw));
+            return hashEsperado.Equals(md5Actual, StringComparison.InvariantCulture);
         }
     }
 }

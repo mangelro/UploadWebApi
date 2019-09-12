@@ -55,6 +55,9 @@
     <Reference Include="Autofac.Integration.WebApi.Owin, Version=4.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\NuGetRepository\Autofac.WebApi2.Owin.4.0.0\lib\net45\Autofac.Integration.WebApi.Owin.dll</HintPath>
     </Reference>
+    <Reference Include="AutoMapper, Version=9.0.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\NuGetRepository\AutoMapper.9.0.0\lib\net461\AutoMapper.dll</HintPath>
+    </Reference>
     <Reference Include="Dapper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\NuGetRepository\Dapper.2.0.4\lib\netstandard2.0\Dapper.dll</HintPath>
     </Reference>
@@ -125,10 +128,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Applicacion\IHashService.cs" />
+    <Compile Include="Applicacion\Mapeado\IMapperService.cs" />
     <Compile Include="Applicacion\Servicios\ConfiguracionRegistro.cs" />
+    <Compile Include="Applicacion\Servicios\ContrasteHuellasService.cs" />
     <Compile Include="Applicacion\Servicios\GestionHuellasService.cs" />
     <Compile Include="Applicacion\Servicios\IConfiguracionRegistros.cs" />
-    <Compile Include="Applicacion\Servicios\MD5HashService.cs" />
+    <Compile Include="Applicacion\Stores\IFiltroCompresion.cs" />
+    <Compile Include="Infraestructura\Mapeador\AutoMapperAdapter.cs" />
+    <Compile Include="Infraestructura\Servicios\GZipCompresionService.cs" />
+    <Compile Include="Infraestructura\Servicios\SevenZipCompresionService.cs" />
+    <Compile Include="Infraestructura\Servicios\FakeCompresionService.cs" />
+    <Compile Include="Infraestructura\Servicios\MD5HashService.cs" />
     <Compile Include="Applicacion\Servicios\NotFoundException.cs" />
     <Compile Include="Applicacion\Servicios\ServiceException.cs" />
     <Compile Include="Applicacion\Stores\DapperHuellasStore.cs" />
@@ -139,7 +149,8 @@
     <Compile Include="App_Start\Startup.auth.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\FindController.cs" />
-    <Compile Include="Controllers\V1\ContrastesController.cs" />
+    <Compile Include="Controllers\V1\BaseApiController.cs" />
+    <Compile Include="Controllers\V1\ContrasteController.cs" />
     <Compile Include="Controllers\V1\GestionController.cs" />
     <Compile Include="Infraestructura\Autofac\InfraestructuraModule.cs" />
     <Compile Include="Infraestructura\Autofac\ApplicationModule.cs" />
@@ -148,16 +159,21 @@
     <Compile Include="Infraestructura\Serializacion\ByteArrayConverter.cs" />
     <Compile Include="Infraestructura\Servicios\IIdentityService.cs" />
     <Compile Include="Infraestructura\Servicios\impl\IdentityService.cs" />
+    <Compile Include="Infraestructura\Servicios\SevenZipHelper.cs" />
     <Compile Include="Infraestructura\SqlBinaryStream\IBinaryData.cs" />
     <Compile Include="Infraestructura\SqlBinaryStream\SqlBinaryData.cs" />
     <Compile Include="Infraestructura\SqlBinaryStream\SqlBinaryInfo.cs" />
     <Compile Include="Infraestructura\SqlBinaryStream\SqlBinaryMetaData.cs" />
     <Compile Include="Infraestructura\SqlBinaryStream\SqlBinaryReader.cs" />
     <Compile Include="Infraestructura\SqlBinaryStream\SqlBinaryWriter.cs" />
+    <Compile Include="Infraestructura\Web\CdfTempFile.cs" />
+    <Compile Include="Infraestructura\Web\QueryStringHelper.cs" />
+    <Compile Include="Models\ContrasteDto.cs" />
     <Compile Include="Models\HuellaDto.cs" />
     <Compile Include="Models\GetHuellaDto.cs" />
     <Compile Include="Models\InsertHuellaDto.cs" />
     <Compile Include="Models\BlobDto.cs" />
+    <Compile Include="Models\PaginatedList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -173,6 +189,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\SevenZipCompresion\SevenZipCompresion.csproj">
+      <Project>{cdc60859-9857-4e96-9821-67b890d9cc12}</Project>
+      <Name>SevenZipCompresion</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

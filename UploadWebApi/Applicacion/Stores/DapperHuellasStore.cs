@@ -9,8 +9,11 @@
 
 using Dapper;
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -28,10 +31,12 @@ namespace UploadWebApi.Applicacion.Stores
     {
 
         readonly IStoreConfiguration _config;
+        readonly IFiltroCompresion _compresion;
 
-        public DapperHuellasStore(IStoreConfiguration config)
+        public DapperHuellasStore(IStoreConfiguration config, IFiltroCompresion compresion)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
+            _compresion= compresion ?? throw new ArgumentNullException(nameof(compresion));
         }
 
         public async Task CreateAsync(HuellaDto huella, byte[] huellaRaw)
@@ -77,14 +82,83 @@ namespace UploadWebApi.Applicacion.Stores
             }
         }
 
-        public void Delete(int idHuella)
+        public async Task DeleteAsync(int idHuella)
         {
-            throw new NotImplementedException();
+            string sqlString = @"DELETE FROM [inter_HuellasAceite] 
+               WHERE IdHuella=@IdHuella";
+
+            using (var connection = new SqlConnection(_config.ConnectionString))
+            {
+                connection.Open();
+                await connection.ExecuteAsync(sqlString, new { IdHuella = idHuella });
+            }
         }
 
-        public async Task<HuellaDto> ReadAsync(string idMuestra, Guid aplicacion)
+        public async Task<Tuple<IEnumerable<HuellaDto>, int>> ReadAllAsync(int pageNumber, int pageSize, Guid idUsuario, Guid idAplicacion, OrdenListatoTipo orden = OrdenListatoTipo.DESC)
         {
-            string sqlString = @"SELECT
+
+            if (pageNumber < 1)
+                throw new ArgumentException("El número de página ha de ser mayor que 0.");
+
+            if (pageSize < 1)
+                throw new ArgumentException("El tamaño de página ha de ser mayor que cero");
+
+            int rowFrom = ((pageNumber - 1) * pageSize) + 1;
+            int rowTo = rowFrom + pageSize;
+
+            StringBuilder sqlString = new StringBuilder();
+            sqlString.AppendFormat(@"SELECT
+                 [IdHuella]
+                ,[IdMuestra]
+                ,[FechaHuella]
+                ,[NombreFichero]
+                ,[Hash]
+                ,[AppCliente]
+                ,[Propietario]
+                FROM (SELECT *, ROW_NUMBER() over(PARTITION BY AppCliente ORDER BY FechaHuella {0}) RowNum 
+                    FROM [inter_HuellasAceite]
+                    WHERE", orden.ToString().ToUpper());
+
+            sqlString.Append(" [AppCliente] = @AppCliente");
+
+            if (idUsuario!=Guid.Empty)
+            {
+                sqlString.Append(" AND [Propietario]=@Propietario");
+            }
+            sqlString.Append(" ) Q1");
+            sqlString.Append(" WHERE Q1.RowNum >= @RowFrom AND Q1.RowNum < @RowTo ORDER BY Q1.RowNum ASC;");
+
+            sqlString.Append(" SELECT COUNT(*) FROM [inter_HuellasAceite] WHERE [AppCliente] = @AppCliente");
+            if (idUsuario != Guid.Empty)
+            {
+                sqlString.Append(" AND [Propietario]=@Propietario");
+            }
+
+            using (var connection = new SqlConnection(_config.ConnectionString))
+            {
+                connection.Open();
+
+                using (var multi = connection.QueryMultiple(sqlString.ToString(),
+                    new
+                    {
+                        AppCliente = idAplicacion,
+                        Propietario = idUsuario,
+                        RowFrom = rowFrom,
+                        RowTo = rowTo
+                    }))
+                {
+                    var dtos = (await multi.ReadAsync<HuellaDto>()).ToList();
+
+                    int count =(await multi.ReadAsync<int>()).Last();
+
+                    return Tuple.Create<IEnumerable<HuellaDto>, int>(dtos, count);
+                }
+            }
+        }
+
+        public async Task<HuellaDto> ReadAsync(string idMuestra, Guid idUsuario,  Guid idAplicacion)
+        {
+            StringBuilder sqlString = new StringBuilder(@"SELECT
                 [IdHuella]
                 ,[IdMuestra]
                 ,[FechaHuella]
@@ -93,13 +167,18 @@ namespace UploadWebApi.Applicacion.Stores
                 ,[AppCliente]
                 ,[Propietario]
                 FROM [inter_HuellasAceite] 
-                WHERE IdMuestra=@IdMuestra AND AppCliente=@AppCliente";
+                WHERE IdMuestra=@IdMuestra AND AppCliente=@AppCliente");
+
+            if (idUsuario != Guid.Empty)
+            {
+                sqlString.Append(" AND [Propietario]=@Propietario");
+            }
 
             using (var connection = new SqlConnection(_config.ConnectionString))
             {
                 connection.Open();
 
-                var  dto= await connection.QueryFirstOrDefaultAsync<HuellaDto>(sqlString, new { IdMuestra = idMuestra, AppCliente = aplicacion });
+                var dto = await connection.QueryFirstOrDefaultAsync<HuellaDto>(sqlString.ToString(), new { IdMuestra = idMuestra, AppCliente = idAplicacion, Propietario=idUsuario });
 
                 return dto;
             }
@@ -123,7 +202,7 @@ namespace UploadWebApi.Applicacion.Stores
                         writer.Write(buffer, 0, leidos);
                     } while (leidos == buffer.Length);
                 }
-                return  Task.FromResult(writer.ToArray());
+                return Task.FromResult(_compresion.Descomprimir(writer.ToArray()));
             }
         }
 
@@ -134,13 +213,13 @@ namespace UploadWebApi.Applicacion.Stores
 
             byte[] buffer = new byte[512];
             int leidos = 0;
-            using (var stream = new MemoryStream(huellaRaw, false))
+            using (var stream = new MemoryStream(_compresion.Comprimir(huellaRaw), false))
             {
                 using (var writer = data.OpenWrite(true))
                 {
                     do
                     {
-                        leidos=stream.Read(buffer, 0, buffer.Length);
+                        leidos = stream.Read(buffer, 0, buffer.Length);
                         writer.Write(buffer, 0, leidos);
                     } while (leidos == buffer.Length);
                 }

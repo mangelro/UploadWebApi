@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UploadWebApi.Applicacion.Stores;
+using UploadWebApi.Infraestructura.Servicios;
 using UploadWebApi.Models;
 
 namespace UploadWebApi.Tests
@@ -29,7 +30,7 @@ namespace UploadWebApi.Tests
         {
 
             var bytes = LeerFichero(@"C:\Users\miguel\Documents\Visual Studio 2017\Proyectos\UploadWebApi\UploadWebApi.Tests\ficheros\entrada.pdf");
-            IHuellasStore store = new DapperHuellasStore(_conf);
+            IHuellasStore store = new DapperHuellasStore(_conf, new FakeCompresionService());
 
             HuellaDto dto = new HuellaDto
             {
@@ -52,7 +53,7 @@ namespace UploadWebApi.Tests
         {
 
 
-            IHuellasStore store = new DapperHuellasStore(_conf);
+            IHuellasStore store = new DapperHuellasStore(_conf, new FakeCompresionService());
 
             var bytes = LeerFichero("C:\\entrada.pdf");
 
@@ -68,7 +69,7 @@ namespace UploadWebApi.Tests
         {
 
 
-            IHuellasStore store = new DapperHuellasStore(_conf);
+            IHuellasStore store = new DapperHuellasStore(_conf, new FakeCompresionService());
 
             byte[] salida = await store.ReadHuellaRawAsync(10);
 

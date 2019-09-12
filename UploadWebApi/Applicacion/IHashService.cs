@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+
 
 namespace UploadWebApi.Applicacion
 {
@@ -10,6 +8,9 @@ namespace UploadWebApi.Applicacion
     {
 
         byte[] CalcularHash(byte[] buffer);
+
+
+        bool VerifyHash(string hashEsperado, byte[] raw);
 
     }
 }

@@ -10,5 +10,8 @@ namespace UploadWebApi.Applicacion.Servicios
     {
 
         string RutaFicheros { get; }
+
+        string RutaTemporal { get; }
+        
     }
 }
