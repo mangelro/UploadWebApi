@@ -15,7 +15,7 @@ namespace UploadWebApi.Models
 
         public int TotalPageCount { get; }
 
-        bool HasPreviousPage => (PageNumber > 1);
+        bool HasPreviousPage => (PageNumber > 1) ;
 
         bool HasNextPage => (PageNumber < TotalPageCount);
 
@@ -37,7 +37,7 @@ namespace UploadWebApi.Models
             TotalPageCount = (int)Math.Ceiling(totalCount / (double)pageSize);
         }
 
-        public static PaginatedList<T> Empty() =>  new PaginatedList<T>("",Enumerable.Empty<T>(),1,1,0);
+        public static PaginatedList<T> Empty() =>  new PaginatedList<T>("./",Enumerable.Empty<T>(),1,1,0);
 
     }
 

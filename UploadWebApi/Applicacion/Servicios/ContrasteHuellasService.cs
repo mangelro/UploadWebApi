@@ -15,6 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
 using UploadWebApi.Applicacion.Stores;
+using UploadWebApi.Infraestructura.Proceso;
 using UploadWebApi.Infraestructura.Web;
 using UploadWebApi.Models;
 
@@ -75,7 +76,15 @@ namespace UploadWebApi.Applicacion.Servicios
                     tempFile2.Create(raw2);
 
 
-                    indice = await CompareFiles(tempFile1.TempFileName, tempFile2.TempFileName);
+                    //indice = await CompareFiles(tempFile1.TempFileName, tempFile2.TempFileName);
+
+
+                    ProcessRunner runner = new ProcessRunner(@"C:\Users\miguel\Documents\Visual Studio 2017\Proyectos\ContrasteStub\ContrasteStub\bin\Debug\ContrasteStub.exe", $"--id1={tempFile1.TempFileName} --id2={tempFile2.TempFileName}", false);
+                    var exitCode = runner.Run();
+
+                    if (exitCode == 0)
+                        indice = Double.Parse(runner.Respuesta, System.Globalization.CultureInfo.InvariantCulture);
+
                 }
             }
             

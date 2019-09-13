@@ -45,7 +45,10 @@ namespace UploadWebApi.Controllers.V1
                 else
                     resul = await _service.ConsultarHuellasAsync(pageNumber, pageSize, _identity.UserIdentity, _identity.AppIdentity, orden);
 
-                return Ok(new PaginatedList<GetHuellaDto>(CurrentUrl(), resul.Item1,pageNumber,pageSize,resul.Item2));
+
+                return Ok(PaginatedList<GetHuellaDto>.Empty());
+
+                //return Ok(new PaginatedList<GetHuellaDto>(CurrentUrl(), resul.Item1,pageNumber,pageSize,resul.Item2));
                
             }
             catch (ServiceException sEx)
