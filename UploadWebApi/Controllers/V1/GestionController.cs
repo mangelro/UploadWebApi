@@ -15,11 +15,12 @@ using UploadWebApi.Models;
 namespace UploadWebApi.Controllers.V1
 {
 
-    [Authorize]
+    [Authorize(Roles = "administradores,laboratorios,contrastadores")]
     [RoutePrefix("v1/gestion")]
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class GestionController : BaseApiController
     {
+        const string ROL_CONTRASTADOR = "contrastadores";
 
         readonly GestionHuellasService _service;
         readonly IIdentityService _identity;
@@ -28,28 +29,23 @@ namespace UploadWebApi.Controllers.V1
         {
             _service = service ?? throw new ArgumentNullException(nameof(service));
             _identity= identity ?? throw new ArgumentNullException(nameof(identity));
-
         }
 
         [HttpGet]
         [Route("")]
-        [ResponseType(typeof(PaginatedList<GetHuellaDto>))]
+        [ResponseType(typeof(PaginatedList<GetRowHuellaDto>))]
         public async Task<IHttpActionResult> Get(int pageNumber = 1,int pageSize=10,string orden="desc")
         {
             try
             {
-                Tuple<IEnumerable<GetHuellaDto>, int> resul = null;
+                Tuple<IEnumerable<GetRowHuellaDto>, int> resul = null;
 
-                if (_identity.Roles.Where(r => r == "gestorcontrastes").Any())
+                if (_identity.IsSysAdmin || _identity.Roles.Where(r => r == ROL_CONTRASTADOR).Any())
                     resul = await _service.ConsultarHuellasAsync(pageNumber, pageSize, _identity.AppIdentity, orden);
                 else
                     resul = await _service.ConsultarHuellasAsync(pageNumber, pageSize, _identity.UserIdentity, _identity.AppIdentity, orden);
 
-
-                return Ok(PaginatedList<GetHuellaDto>.Empty());
-
-                //return Ok(new PaginatedList<GetHuellaDto>(CurrentUrl(), resul.Item1,pageNumber,pageSize,resul.Item2));
-               
+                return Ok(new PaginatedList<GetRowHuellaDto>(CurrentUrl(), resul.Item1,pageNumber,pageSize,resul.Item2));
             }
             catch (ServiceException sEx)
             {
@@ -89,7 +85,7 @@ namespace UploadWebApi.Controllers.V1
 
         [HttpGet]
         [Route("{idMuestra}/download")]
-        public async Task<IHttpActionResult> Descarga(string idMuestra)
+        public async Task<IHttpActionResult> Download(string idMuestra)
         {
             try
             {
@@ -126,13 +122,14 @@ namespace UploadWebApi.Controllers.V1
 
         [Route("")]
         [HttpPost]
+        [ResponseType(typeof(GetHuellaDto))]
         public async Task<IHttpActionResult> Post([FromBody] InsertHuellaDto dto)
         {
             try
             {
                 var inserted = await _service.CrearRegistroHuellaAsync(dto, _identity.UserIdentity, _identity.AppIdentity);
 
-                return Created("v1/gestion/" + inserted.IdMuestra, inserted);
+                return Created(CurrentUrl() + "/" + inserted.IdMuestra, inserted);
             }
             catch (ServiceException sEx)
             {

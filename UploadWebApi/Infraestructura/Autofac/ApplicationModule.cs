@@ -8,15 +8,13 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Configuration;
 using Autofac;
 using UploadWebApi.Applicacion;
 using UploadWebApi.Applicacion.Mapeado;
 using UploadWebApi.Applicacion.Servicios;
 using UploadWebApi.Applicacion.Stores;
+using UploadWebApi.Infraestructura.Configuracion;
 using UploadWebApi.Infraestructura.Mapeador;
 using UploadWebApi.Infraestructura.Servicios;
 
@@ -36,15 +34,40 @@ namespace UploadWebApi.Infraestructura.Autofac
 
 
             //filtro para comprimir huellas --FakeCompresionService/ GZipCompresionService / SevenZipCompresionService
-            builder.RegisterType<GZipCompresionService>()
-                .As<IFiltroCompresion>()
-                .InstancePerRequest();
+            //builder.RegisterType<GZipCompresionService>()
+            //    .Keyed<IFiltroCompresion>(CompresionServiceType.GZipCompresionService)
+            //    .InstancePerRequest();
 
+            //builder.RegisterType<FakeCompresionService>()
+            //.Keyed<IFiltroCompresion>(CompresionServiceType.FakeCompresionService)
+            //.InstancePerRequest();
+
+            //builder.RegisterType<SevenZipCompresionService>()
+            //.Keyed<IFiltroCompresion>(CompresionServiceType.SevenZipCompresionService)
+            //.InstancePerRequest();
+
+            //builder.Register(c =>
+            //{
+            //    CompresionServiceType compresion = (CompresionServiceType) Enum.Parse(typeof(CompresionServiceType), GetAppConfig("storeConfCompresionService", CompresionServiceType.GZipCompresionService.ToString()));
+
+            //    return new DapperHuellasStore(c.Resolve<IStoreConfiguration>(), 
+            //                            c.ResolveKeyed<IFiltroCompresion>(compresion));
+            //})
+            //.As<IHuellasStore>()
+            //.InstancePerRequest();
+
+
+            //filtro para comprimir huellas --FakeCompresionService/ GZipCompresionService / SevenZipCompresionService
+            builder.RegisterType<GZipCompresionService>()
+            .As<IFiltroCompresion>()
+            .InstancePerRequest();
 
             //Stores de huellas
             builder.RegisterType<DapperHuellasStore>()
                 .As<IHuellasStore>()
                 .InstancePerRequest();
+
+         
 
 
             //Servicio de Funciones Hash
@@ -79,6 +102,14 @@ namespace UploadWebApi.Infraestructura.Autofac
 
 
 
+        }
+
+
+        string GetAppConfig(string configName, string defaultValue)
+        {
+            string val = ConfigurationManager.AppSettings[configName];
+
+            return (String.IsNullOrEmpty(val) ? defaultValue : val);
         }
     }
 }

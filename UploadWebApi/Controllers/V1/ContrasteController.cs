@@ -9,8 +9,7 @@ using UploadWebApi.Models;
 
 namespace UploadWebApi.Controllers.V1
 {
-
-    [Authorize]
+    [Authorize(Roles = "administradores,contrastadores")]
     [RoutePrefix("v1/contrastar")]
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class ContrasteController : BaseApiController
@@ -36,6 +35,10 @@ namespace UploadWebApi.Controllers.V1
             catch (NotFoundException noEx)
             {
                 return BadRequest(noEx.Message);
+            }
+            catch (ServiceException sEx)
+            {
+                return BadRequest(sEx.Message);
             }
             catch (Exception ex)
             {

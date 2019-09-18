@@ -42,19 +42,24 @@ namespace UploadWebApi.Applicacion.Servicios
         }
 
 
-        public async Task<Tuple<IEnumerable<GetHuellaDto>, int>> ConsultarHuellasAsync(int pageNumber, int pageSize, Guid idAplicacion, string orden)
+        public async Task<Tuple<IEnumerable<GetRowHuellaDto>, int>> ConsultarHuellasAsync(int pageNumber, int pageSize, Guid idAplicacion, string orden)
         {
+
+
             return await ConsultarHuellasAsync(pageNumber, pageSize, Guid.Empty, idAplicacion, orden);
         }
 
-        public async Task<Tuple<IEnumerable<GetHuellaDto>, int>> ConsultarHuellasAsync(int pageNumber, int pageSize, Guid idUsuario, Guid idAplicacion, string orden)
+        public async Task<Tuple<IEnumerable<GetRowHuellaDto>, int>> ConsultarHuellasAsync(int pageNumber, int pageSize, Guid idUsuario, Guid idAplicacion, string orden)
         {
 
             try
             {
-                var tupla = await _store.ReadAllAsync(pageNumber, pageSize, idUsuario, idAplicacion, OrdenListatoTipo.DESC);
 
-                return Tuple.Create<IEnumerable<GetHuellaDto>, int>(_mapperService.Map<HuellaDto, GetHuellaDto>(tupla.Item1), tupla.Item2);
+                OrdenListatoTipo tipoOrden = (OrdenListatoTipo) Enum.Parse(typeof(OrdenListatoTipo), orden.ToUpper());
+
+                var tupla = await _store.ReadAllAsync(pageNumber, pageSize, idUsuario, idAplicacion, tipoOrden);
+
+                return Tuple.Create<IEnumerable<GetRowHuellaDto>, int>(_mapperService.Map<HuellaDto, GetRowHuellaDto>(tupla.Item1), tupla.Item2);
 
             }
             catch (ArgumentException ex)
@@ -85,6 +90,10 @@ namespace UploadWebApi.Applicacion.Servicios
                 HuellaDto inserted = null;
                 using (TransactionScope tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
+
+                    
+
+
                     if (_hashService.VerifyHash(dto.Hash, dto.Stream))
                     {
 
@@ -120,10 +129,9 @@ namespace UploadWebApi.Applicacion.Servicios
             }
             catch (TransactionAbortedException ex)
             {
-                throw new ServiceException($"El archivo {dto.NombreFichero} ya existe en el sistema.");
+                throw new ServiceException(ex.Message);
             }
-
-
+        
         }
 
         public async Task BorrarRegistroHuellaAsync(string idMuestra, Guid idUSuario, Guid idAplicacion)

@@ -17,9 +17,9 @@ namespace UploadWebApi.Tests
 
             CancellationTokenSource source = new CancellationTokenSource();
 
-            ProcessRunner runner = new ProcessRunner(@"C:\Users\miguel\Documents\Visual Studio 2017\Proyectos\ContrasteStub\ContrasteStub\bin\Debug\ContrasteStub.exe", "--id1=file1.txt --id2=file2.txt", false);
+            ProcessRunner runner = new ProcessRunner(@"C:\Users\miguel\Documents\Visual Studio 2017\Proyectos\ContrasteStub\ContrasteStub\bin\Debug\ContrasteStub.exe", false);
 
-            var r=runner.RunAsync(source.Token)
+            var r=runner.RunAsync("--id1=file1.txt --id2=file2.txt", source.Token)
                 .ContinueWith(t=>
                 {
 
@@ -47,9 +47,9 @@ namespace UploadWebApi.Tests
         public async Task Ejecutar_OKAsync()
         {
 
-            ProcessRunner runner = new ProcessRunner(@"C:\Users\miguel\Documents\Visual Studio 2017\Proyectos\ContrasteStub\ContrasteStub\bin\Debug\ContrasteStub.exe", "--id1=file1.txt --id2=file2.txt", false);
+            ProcessRunner runner = new ProcessRunner(@"C:\Users\miguel\Documents\Visual Studio 2017\Proyectos\ContrasteStub\ContrasteStub\bin\Debug\ContrasteStub.exe",  false);
 
-            var exitCode = await runner.RunAsync();
+            var exitCode = await runner.RunAsync("--id1=file1.txt --id2=file2.txt");
 
             Console.WriteLine("Exit Code: " + exitCode.ToString());
             if (exitCode == 0)
@@ -63,9 +63,9 @@ namespace UploadWebApi.Tests
         public void Ejecutar_OKSync()
         {
 
-            ProcessRunner runner = new ProcessRunner(@"C:\Users\miguel\Documents\Visual Studio 2017\Proyectos\ContrasteStub\ContrasteStub\bin\Debug\ContrasteStub.exe", "--id1=file1.txt --id2=file2.txt", false);
+            ProcessRunner runner = new ProcessRunner(@"C:\Users\miguel\Documents\Visual Studio 2017\Proyectos\ContrasteStub\ContrasteStub\bin\Debug\ContrasteStub.exe",false);
 
-            var exitCode = runner.Run();
+            var exitCode = runner.Run("--id1=file1.txt --id2=file2.txt");
 
             Console.WriteLine("Exit Code: " + exitCode.ToString());
             if (exitCode == 0)

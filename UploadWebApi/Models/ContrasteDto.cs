@@ -15,12 +15,22 @@ using System.Threading.Tasks;
 
 namespace UploadWebApi.Models
 {
+
+
+    public enum EstadoContrasteType
+    {
+        VALIDO,
+        INVALIDO
+    }
+
     /// <summary>
     /// 
     /// </summary>
     public class ContrasteDto
     {
+        public DateTime FechaContraste { get; set; }
         public double IndiceSimilitud { get; set; }
-        public string Estado { get; set; }
+        public double UmbralAceptacion { get; set; }
+        public EstadoContrasteType Estado { get; set; }
     }
 }

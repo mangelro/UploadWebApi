@@ -1,6 +1,7 @@
 ﻿using System.Configuration;
+using UploadWebApi.Applicacion.Stores;
 
-namespace UploadWebApi.Applicacion.Stores
+namespace UploadWebApi.Infraestructura.Configuracion
 {
     public class StoreConfiguration : IStoreConfiguration
     {

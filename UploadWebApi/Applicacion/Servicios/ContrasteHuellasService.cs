@@ -59,37 +59,25 @@ namespace UploadWebApi.Applicacion.Servicios
 
 
             double indice = -1;
-            using (var tempFile1 = new CdfTempFile(_conf.RutaTemporal))
+            using (var tempFile1 = await CrearFicheroTemporaAsync(tConsulta1.Result.IdMuestra, tConsulta1.Result.IdHuella, tConsulta1.Result.Hash))
             {
-                byte[] raw1 = await _store.ReadHuellaRawAsync(tConsulta1.Result.IdHuella);
-                if (!_hashService.VerifyHash(tConsulta1.Result.Hash, raw1))
-                    throw new ServiceException($"La verificación de firmas de la muestra {idMuestra1} no es correcta.");
-
-                tempFile1.Create(raw1);
-
-                using (var tempFile2 = new CdfTempFile(_conf.RutaTemporal))
+                using (var tempFile2 = await CrearFicheroTemporaAsync(tConsulta2.Result.IdMuestra, tConsulta2.Result.IdHuella, tConsulta2.Result.Hash))
                 {
-                    byte[] raw2 = await _store.ReadHuellaRawAsync(tConsulta2.Result.IdHuella);
-                    if (!_hashService.VerifyHash(tConsulta2.Result.Hash, raw2))
-                        throw new ServiceException($"La verificación de firmas de la muestra {idMuestra2} no es correcta.");
+                    ProcessRunner runner = new ProcessRunner(_conf.RutaExeContraste,false);
 
-                    tempFile2.Create(raw2);
-
-
-                    //indice = await CompareFiles(tempFile1.TempFileName, tempFile2.TempFileName);
-
-
-                    ProcessRunner runner = new ProcessRunner(@"C:\Users\miguel\Documents\Visual Studio 2017\Proyectos\ContrasteStub\ContrasteStub\bin\Debug\ContrasteStub.exe", $"--id1={tempFile1.TempFileName} --id2={tempFile2.TempFileName}", false);
-                    var exitCode = runner.Run();
+                    var exitCode = runner.Run($"--id1={tempFile1.TempFileName} --id2={tempFile2.TempFileName}");
 
                     if (exitCode == 0)
                         indice = Double.Parse(runner.Respuesta, System.Globalization.CultureInfo.InvariantCulture);
 
                 }
             }
-            
+
             return new ContrasteDto {
-                 IndiceSimilitud=indice,
+                FechaContraste = DateTime.UtcNow,
+                UmbralAceptacion = _conf.UmbralContraste,
+                IndiceSimilitud = indice,
+                Estado = (indice >= _conf.UmbralContraste ? EstadoContrasteType.VALIDO : EstadoContrasteType.INVALIDO),
             };
         }
 
@@ -106,11 +94,20 @@ namespace UploadWebApi.Applicacion.Servicios
            
         }
 
-        Task<double> CompareFiles(string file1, string file2)
-        {
-            return Task.FromResult(0.99);
-        }
 
+        async Task<CdfTempFile> CrearFicheroTemporaAsync(string idMuestra, int idHuella,string hash)
+        {
+
+            var tempFile = new CdfTempFile(_conf.RutaTemporal);
+
+            byte[] raw = await _store.ReadHuellaRawAsync(idHuella);
+            if (!_hashService.VerifyHash(hash, raw))
+                throw new ServiceException($"La verificación de firmas de la muestra {idMuestra} no es correcta.");
+
+            tempFile.Create(raw);
+
+            return tempFile;
+        }
     
     }
 }

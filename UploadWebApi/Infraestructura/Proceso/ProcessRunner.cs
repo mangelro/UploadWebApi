@@ -22,8 +22,9 @@ namespace UploadWebApi.Infraestructura.Proceso
     /// </summary>
     public class ProcessRunner 
     {
-        readonly ProcessStartInfo _startInfo;
+
         readonly bool _throwException;
+        readonly string _exeFile;
 
         StringBuilder _output = new StringBuilder();
         StringBuilder _error = new StringBuilder();
@@ -32,9 +33,10 @@ namespace UploadWebApi.Infraestructura.Proceso
         bool _isRunning = false;
 
 
-        public ProcessRunner(string exeFile, string args, bool throwException)
+        public ProcessRunner(string exeFile, bool throwException)
         {
-            _startInfo = GetProcessStartInfo(exeFile, args);
+
+            _exeFile = exeFile;
             _throwException = throwException;
         }
 
@@ -43,7 +45,7 @@ namespace UploadWebApi.Infraestructura.Proceso
         {
             var process = new Process
             {
-                StartInfo = _startInfo,
+                StartInfo = info,
             };
 
             return process;
@@ -77,21 +79,21 @@ namespace UploadWebApi.Infraestructura.Proceso
         public string Error => _error.ToString();
 
 
-        public int Run()
+        public int Run(string args)
         {
             _isRunning = true;
 
-            return RunCore();
+            return InternalRun(args);
         }
 
 
-        public Task<int> RunAsync(CancellationToken token=default(CancellationToken))
+        public Task<int> RunAsync(string args, CancellationToken token =default(CancellationToken))
         {
             _isRunning = true;
 
             return Task.Factory.StartNew<int>(() =>
             {
-                return RunCore();
+                return InternalRun(args);
 
             }, cancellationToken:token);
         }
@@ -99,9 +101,11 @@ namespace UploadWebApi.Infraestructura.Proceso
 
         public bool IsRunning => _isRunning;
 
-        int RunCore()
+
+
+        int InternalRun(string args)
         {
-            using (var process = GetProcess(_startInfo))
+            using (var process = GetProcess(GetProcessStartInfo(_exeFile,args)))
             {
 
                 process.EnableRaisingEvents = true;

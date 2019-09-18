@@ -78,7 +78,7 @@ namespace UploadWebApi.Applicacion.Stores
             }
             catch (TransactionAbortedException ex)
             {
-                // Handle exception
+                System.Diagnostics.Debug.Write("[DapperHuellasStore.CreateAsync] " + ex.Message);
             }
         }
 
@@ -159,15 +159,16 @@ namespace UploadWebApi.Applicacion.Stores
         public async Task<HuellaDto> ReadAsync(string idMuestra, Guid idUsuario,  Guid idAplicacion)
         {
             StringBuilder sqlString = new StringBuilder(@"SELECT
-                [IdHuella]
-                ,[IdMuestra]
-                ,[FechaHuella]
-                ,[NombreFichero]
-                ,[Hash]
-                ,[AppCliente]
-                ,[Propietario]
-                FROM [inter_HuellasAceite] 
-                WHERE IdMuestra=@IdMuestra AND AppCliente=@AppCliente");
+                  h.[IdHuella]
+                ,h.[IdMuestra]
+                ,h.[FechaHuella]
+                ,h.[NombreFichero]
+                ,h.[Hash]
+                ,h.[AppCliente]
+                ,h.[Propietario]
+                ,p.[NombrePanel] NombrePropietario
+                FROM [inter_HuellasAceite] h JOIN [inter_Paneles] p ON h.Propietario=p.IdUsuario
+                WHERE h.IdMuestra=@IdMuestra AND h.AppCliente=@AppCliente");
 
             if (idUsuario != Guid.Empty)
             {
@@ -187,7 +188,7 @@ namespace UploadWebApi.Applicacion.Stores
         public Task<byte[]> ReadHuellaRawAsync(int idHuella)
         {
 
-            byte[] buffer = new byte[128];
+            byte[] buffer = new byte[1024];
             int leidos = 0;
 
             SqlBinaryData data = SqlBinaryData.CreateIntPrimaryKey(_config.ConnectionString, "inter_HuellasAceite", "Huella", idHuella, 128);
@@ -211,7 +212,7 @@ namespace UploadWebApi.Applicacion.Stores
 
             SqlBinaryData data = SqlBinaryData.CreateIntPrimaryKey(_config.ConnectionString, "inter_HuellasAceite", "Huella", idHuella, 1024);
 
-            byte[] buffer = new byte[512];
+            byte[] buffer = new byte[1024];
             int leidos = 0;
             using (var stream = new MemoryStream(_compresion.Comprimir(huellaRaw), false))
             {

@@ -21,5 +21,6 @@ namespace UploadWebApi.Models
         public string Hash { get; set; }
         public Guid AppCliente { get; set; }
         public Guid Propietario { get; set; }
+        public string NombrePropietario { get; set; }
     }
 }

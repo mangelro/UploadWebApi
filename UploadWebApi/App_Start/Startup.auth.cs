@@ -36,10 +36,10 @@ namespace UploadWebApi
                             {
                                 var queryString = QueryStringHelper.ParseQuery(context.Request.QueryString.Value);
 
-                                var token = queryString["accesstoken"];
+                                var token = queryString["access_token"];
 
-                                context.Token = token;
-
+                                if (!String.IsNullOrEmpty(token))
+                                    context.Token = token;
                             }
 
                         }

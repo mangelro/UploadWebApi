@@ -8,7 +8,9 @@
  */
 
 using System;
-
+using System.Configuration;
+using System.Web;
+using UploadWebApi.Infraestructura.Configuracion;
 
 namespace UploadWebApi.Applicacion.Servicios
 {
@@ -17,8 +19,15 @@ namespace UploadWebApi.Applicacion.Servicios
     /// </summary>
     public class ConfiguracionRegistro : IConfiguracionRegistros
     {
-        public string RutaFicheros => "C:\\ArchivosCDF";
-        public string RutaTemporal => System.IO.Path.GetTempPath();
+        public string RutaFicheros => ConfigurationManagerHelper.GetAppConfig("appConfRutaFicheros", "C:\\ArchivosCDF");
+
+        public string RutaTemporal => ConfigurationManagerHelper.GetAppConfig("appConfRutaTemporal", System.IO.Path.GetTempPath());
+
+        public string RutaExeContraste => HttpContext.Current.Server.MapPath(ConfigurationManagerHelper.GetAppConfig("appConfRutaExeContraste", "~/App_Data/Contraste/ContrasteStub.exe"));
+
+
+        public double UmbralContraste => Double.Parse(ConfigurationManagerHelper.GetAppConfig("appConfUmbralContraste", "0.90"), System.Globalization.CultureInfo.InvariantCulture);
+
 
 
     }

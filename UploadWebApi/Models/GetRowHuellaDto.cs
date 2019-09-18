@@ -6,19 +6,21 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using UploadWebApi.Infraestructura.Serializacion;
 
 namespace UploadWebApi.Models
 {
     /// <summary>
     /// 
     /// </summary>
-    public class GetHuellaDto
+    public class GetRowHuellaDto
     {
         public string IdMuestra { get; set; }
         public DateTime FechaAnalisis { get; set; }
         public string NombreFichero { get; set; }
-        public string Hash { get; set; }
-        public Guid IdRegistrador { get; set; }
-        public string NombreRegistrador { get; set; }
     }
 }
