@@ -16,11 +16,16 @@ namespace UploadWebApi.Models
     {
         public int IdHuella { get; set; }
         public string IdMuestra { get; set; }
-        public DateTime FechaHuella { get; set; }
+        public DateTime FechaAnalisis { get; set; }
         public string NombreFichero { get; set; }
         public string Hash { get; set; }
         public Guid AppCliente { get; set; }
         public Guid Propietario { get; set; }
         public string NombrePropietario { get; set; }
+        public DateTime? FechaBloqueo { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool EstaBloqueada => FechaBloqueo.HasValue;
     }
 }

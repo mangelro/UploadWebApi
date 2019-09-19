@@ -34,7 +34,7 @@ namespace UploadWebApi.Tests
 
             HuellaDto dto = new HuellaDto
             {
-                FechaHuella = DateTime.Now,
+                FechaAnalisis = DateTime.Now,
                 AppCliente = Guid.Parse("75AB4073-D7F5-4EB7-BBAB-2ABBE59D228F"),
                 IdMuestra = "XX-33",
                 NombreFichero = "OHO_3_029.CDF",

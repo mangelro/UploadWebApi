@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 using System.Transactions;
 using UploadWebApi.Applicacion.Mapeado;
 using UploadWebApi.Applicacion.Stores;
+using UploadWebApi.Infraestructura.netCDF;
+using UploadWebApi.Infraestructura.Web;
 using UploadWebApi.Models;
 
 namespace UploadWebApi.Applicacion.Servicios
@@ -41,6 +43,36 @@ namespace UploadWebApi.Applicacion.Servicios
             _mapperService = mapperService ?? throw new ArgumentNullException(nameof(mapperService));
         }
 
+        /// <summary>
+        /// Verifica la validez (firma y formato) del fichero
+        /// </summary>
+        /// <param name="raw"></param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
+        public Task VerificarFicheroCDF(byte[] raw, string hash)
+        {
+
+            using (var tempFile = new CdfTempFile(_conf.RutaTemporal))
+            {
+                if (!_hashService.VerifyHash(hash, raw))
+                    throw new ServiceException($"La verificación de firmas de la huella no es correcta.");
+
+                tempFile.Create(raw);
+
+                var parser = new NetCDFParser(new NetCDFConfig());
+
+                try
+                {
+                    parser.Procesar(tempFile.TempFileName);
+                }
+                catch (NetCDFException ex)
+                {
+                    throw new ServiceException(ex.Message);
+                }
+
+                return Task.CompletedTask;
+            }
+        }
 
         public async Task<Tuple<IEnumerable<GetRowHuellaDto>, int>> ConsultarHuellasAsync(int pageNumber, int pageSize, Guid idAplicacion, string orden)
         {
@@ -55,7 +87,7 @@ namespace UploadWebApi.Applicacion.Servicios
             try
             {
 
-                OrdenListatoTipo tipoOrden = (OrdenListatoTipo) Enum.Parse(typeof(OrdenListatoTipo), orden.ToUpper());
+                OrdenListatoTipo tipoOrden = (OrdenListatoTipo)Enum.Parse(typeof(OrdenListatoTipo), orden.ToUpper());
 
                 var tupla = await _store.ReadAllAsync(pageNumber, pageSize, idUsuario, idAplicacion, tipoOrden);
 
@@ -67,12 +99,11 @@ namespace UploadWebApi.Applicacion.Servicios
                 throw new ServiceException(ex.Message, ex);
             }
         }
-        
+
         public async Task<GetHuellaDto> ConsultarHuellaAsync(string idMuestra, Guid idAplicacion)
         {
             return await ConsultarHuellaAsync(idMuestra, Guid.Empty, idAplicacion);
         }
-
 
         public async Task<GetHuellaDto> ConsultarHuellaAsync(string idMuestra, Guid idUsuario, Guid idAplicacion)
         {
@@ -80,7 +111,12 @@ namespace UploadWebApi.Applicacion.Servicios
 
             ThrowIfNull(idMuestra, huella);
 
-            return _mapperService.Map<HuellaDto,GetHuellaDto>(huella);
+
+            var dto = _mapperService.Map<HuellaDto, GetHuellaDto>(huella);
+
+            //dto.LinkDescarga = $"/{huella.IdHuella}/download";
+
+            return dto;
         }
 
         public async Task<GetHuellaDto> CrearRegistroHuellaAsync(InsertHuellaDto dto, Guid idUsuario, Guid idAplicacion)
@@ -91,32 +127,23 @@ namespace UploadWebApi.Applicacion.Servicios
                 using (TransactionScope tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
 
-                    
 
-
-                    if (_hashService.VerifyHash(dto.Hash, dto.Stream))
+                    inserted = new HuellaDto
                     {
+                        IdMuestra = dto.IdMuestra,
+                        NombreFichero = dto.NombreFichero,
+                        FechaAnalisis = dto.FechaAnalisis,
+                        AppCliente = idAplicacion,
+                        Propietario = idUsuario,
+                        Hash = dto.Hash,
+                    };
 
-                        inserted = new HuellaDto
-                        {
-                            IdMuestra = dto.IdMuestra,
-                            NombreFichero = dto.NombreFichero,
-                            FechaHuella = dto.FechaAnalisis,
-                            AppCliente = idAplicacion,
-                            Propietario = idUsuario,
-                            Hash = dto.Hash,
-                        };
+                    await _store.CreateAsync(inserted, dto.Stream);
 
-                        await _store.CreateAsync(inserted, dto.Stream);
+                    var fileuploadPath = _conf.RutaFicheros;
 
-                        var fileuploadPath = _conf.RutaFicheros;
-
-                        CrearFichero(dto.Stream, Path.Combine(fileuploadPath, GetFormatoNombre(dto.NombreFichero, inserted.IdHuella)));
-
-                    }
-                    else
-                        throw new ServiceException($"La verificación de firmas de la muestra {dto.IdMuestra} no es correcta.");
-
+                    CrearFichero(dto.Stream, Path.Combine(fileuploadPath, GetFormatoNombre(dto.NombreFichero, inserted.IdHuella)));
+                    
                     tran.Complete();
 
                     return _mapperService.Map<HuellaDto, GetHuellaDto>(inserted);
@@ -131,10 +158,10 @@ namespace UploadWebApi.Applicacion.Servicios
             {
                 throw new ServiceException(ex.Message);
             }
-        
+
         }
 
-        public async Task BorrarRegistroHuellaAsync(string idMuestra, Guid idUSuario, Guid idAplicacion)
+        public async Task BorrarRegistroHuellaAsync(string idMuestra, Guid idUSuario, Guid idAplicacion, bool forzarBorrado)
         {
 
             HuellaDto huella = null;
@@ -146,6 +173,12 @@ namespace UploadWebApi.Applicacion.Servicios
                     huella = await _store.ReadAsync(idMuestra, idUSuario, idAplicacion);
 
                     ThrowIfNull(idMuestra, huella);
+
+
+                    if (huella.EstaBloqueada && !forzarBorrado)
+                    {
+                        throw new ServiceException($"La huella {idMuestra} está bloqueada y no puede ser eliminada.");
+                    }
 
                     await _store.DeleteAsync(huella.IdHuella);
 
@@ -163,7 +196,7 @@ namespace UploadWebApi.Applicacion.Servicios
             }
             catch (TransactionAbortedException ex)
             {
-                throw new ServiceException($"El archivo {huella.NombreFichero} no existe en el sistema.");
+                throw new ServiceException(ex.Message);
             }
 
         }
@@ -174,11 +207,32 @@ namespace UploadWebApi.Applicacion.Servicios
 
             ThrowIfNull(idMuestra, huella);
 
+            return await DownloadHuellaInternalAsync(huella);
+        }
+
+        public async Task<BlobDto> DownloadHuellaAsync(int idHuella)
+        {
+
+            var huella = await _store.ReadAsync(idHuella);
+
+            ThrowIfNull("", huella);
+
+            return await DownloadHuellaInternalAsync(huella);
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="huella"></param>
+        /// <returns></returns>
+        async Task<BlobDto> DownloadHuellaInternalAsync(HuellaDto huella)
+        {
+
             byte[] huellaRaw = await _store.ReadHuellaRawAsync(huella.IdHuella);
 
             if (!_hashService.VerifyHash(huella.Hash, huellaRaw))
                 throw new ServiceException($"La verificación de firmas de la muestra {huella.IdMuestra} no es correcta.");
-
 
 
             return new BlobDto
@@ -188,11 +242,11 @@ namespace UploadWebApi.Applicacion.Servicios
                 Hash = huella.Hash,
             };
         }
-
+        
         void ThrowIfNull(string idMuestra, HuellaDto huella)
         {
             if (huella == null)
-                throw new NotFoundException($"La huella de la muestra {idMuestra} no existe en el sistema.");
+                throw new NotFoundException($"La huella de la muestra {idMuestra} no existe en el sistema o no está autorizado.");
         }
 
         static string GetFormatoNombre(string nombreFichero, int idHuella)

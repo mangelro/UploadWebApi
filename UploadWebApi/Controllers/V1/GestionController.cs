@@ -66,6 +66,7 @@ namespace UploadWebApi.Controllers.V1
             {
                 var huella = await _service.ConsultarHuellaAsync(idMuestra, _identity.AppIdentity);
 
+                //huella.LinkDescarga = CurrentUrl() + huella.LinkDescarga;
                 return Ok(huella);
             }
             catch (ServiceException sEx)
@@ -120,6 +121,44 @@ namespace UploadWebApi.Controllers.V1
         }
 
 
+        [HttpGet]
+        [Route("{idMuestra}/{idHuella:int}/download")]
+        [AllowAnonymous]
+        public async Task<IHttpActionResult> Download(string idMuestra,int idHuella)
+        {
+            try
+            {
+                BlobDto dataStream = await _service.DownloadHuellaAsync(idHuella);
+
+
+
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StreamContent(dataStream.Raw)
+                };
+                response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+                {
+                    FileName = dataStream.NombreFichero
+                };
+                response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+
+                return ResponseMessage(response);
+            }
+            catch (ServiceException sEx)
+            {
+                return BadRequest(sEx.Message);
+            }
+            catch (NotFoundException noEx)
+            {
+                return BadRequest(noEx.Message);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
+
         [Route("")]
         [HttpPost]
         [ResponseType(typeof(GetHuellaDto))]
@@ -127,6 +166,9 @@ namespace UploadWebApi.Controllers.V1
         {
             try
             {
+
+                await _service.VerificarFicheroCDF(dto.Stream,dto.Hash);
+
                 var inserted = await _service.CrearRegistroHuellaAsync(dto, _identity.UserIdentity, _identity.AppIdentity);
 
                 return Created(CurrentUrl() + "/" + inserted.IdMuestra, inserted);
@@ -149,7 +191,16 @@ namespace UploadWebApi.Controllers.V1
        
             try
             {
-                await _service.BorrarRegistroHuellaAsync(idMuestra,_identity.UserIdentity, _identity.AppIdentity);
+
+                if (_identity.IsSysAdmin)
+                {
+                    await _service.BorrarRegistroHuellaAsync(idMuestra, Guid.Empty, _identity.AppIdentity, true);
+                }
+                else
+                {
+                    await _service.BorrarRegistroHuellaAsync(idMuestra, _identity.UserIdentity, _identity.AppIdentity, false);
+                }
+
                 return NoContent();
             }
             catch (ServiceException sEx)

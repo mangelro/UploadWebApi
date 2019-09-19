@@ -19,8 +19,13 @@ namespace UploadWebApi.Applicacion.Stores
 
         Task<Tuple<IEnumerable<HuellaDto>, int>> ReadAllAsync(int pageNumber, int pageSize, Guid idUsuario, Guid idAplicacion, OrdenListatoTipo orden = OrdenListatoTipo.DESC);
         Task<HuellaDto> ReadAsync(string idMuestra, Guid idUsuario, Guid idAplicacion);
+        Task<HuellaDto> ReadAsync(int idHuella);
+
         Task CreateAsync(HuellaDto huella,byte[] huellaRaw);
         Task DeleteAsync(int idHuella);
+        Task BloquearAsync(int idHuella, DateTime fechaBloqueo);
+
+
         Task<byte[]> ReadHuellaRawAsync(int idHuella);
         Task WriteHuellaRawAsync(int idHuella, byte[] buffer);
     }

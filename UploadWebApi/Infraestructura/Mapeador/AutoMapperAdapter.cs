@@ -37,8 +37,8 @@ namespace UploadWebApi.Infraestructura.Mapeador
         {
             var configuration = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<HuellaDto, GetRowHuellaDto>()
-                .ForMember(dest => dest.FechaAnalisis, opt => opt.MapFrom(src => src.FechaHuella));
+                cfg.CreateMap<HuellaDto, GetRowHuellaDto>();
+                //.ForMember(dest => dest.FechaAnalisis, opt => opt.MapFrom(src => src.FechaHuella));
 
                 cfg.CreateMap<HuellaDto, GetHuellaDto>()
                 .ForMember(dest => dest.IdRegistrador, opt => opt.MapFrom(src => src.Propietario))

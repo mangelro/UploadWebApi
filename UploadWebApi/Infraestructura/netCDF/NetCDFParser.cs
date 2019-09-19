@@ -21,6 +21,10 @@ namespace UploadWebApi.Infraestructura.netCDF
     /// </summary>
     public class NetCDFParser
     {
+        const string UNKNOW_EXCEPTION = "Unknown file format";
+        const string NOTFOUND_EXCEPTION = "No such file or directory";
+
+
 
 
         readonly Dictionary<string, string> _atributos = new Dictionary<string, string>();
@@ -43,11 +47,29 @@ namespace UploadWebApi.Infraestructura.netCDF
             var exitCode = runner.Run("-x " + cdfPath);
 
 
-            if(exitCode==0)
+            if (exitCode == 0)
                 XMLParser(runner.Respuesta);
             else
-                throw new NetCDFException($"Error fichero CDF {System.IO.Path.GetFileName(cdfPath)}. {ProcesarError(runner.Error)}");
+                ProcesarExcepcion(runner.Error,System.IO.Path.GetFileName(cdfPath));
 
+        }
+
+        /// <summary>
+        /// Devuelve el valor del atributo de metadatos del fichero CDF.
+        /// Si no existe devuelve cadena vacia
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public string this[string name]
+        {
+            get
+            {
+                if (_atributos.TryGetValue(name, out string value))
+                {
+                    return value;
+                }
+                return String.Empty;
+            }
         }
 
         void XMLParser(string inputXML)
@@ -60,7 +82,7 @@ namespace UploadWebApi.Infraestructura.netCDF
                 {
                     if (reader.NodeType == XmlNodeType.Element)
                     {
-                        if (reader.Name == "attribute" && reader.Depth==1)
+                        if (reader.Name == "attribute" && reader.Depth == 1)
                         {
                             if (!_atributos.ContainsKey(reader.GetAttribute("name")))
                             {
@@ -74,28 +96,38 @@ namespace UploadWebApi.Infraestructura.netCDF
         }
 
 
-        public string this[string name] => _atributos[name];
 
 
-
-
-        string ProcesarError(string error)
+        void ProcesarExcepcion(string error,string fileName)
         {
 
-            int pos = error.IndexOf("NetCDF:");
+            int pos = error.LastIndexOf(':');
 
             if (pos == -1)
-                return error;
+            {
+                throw new NetCDFException(error);
+            }
             else
-                return error.Substring(pos);
+            {
+                string textoError = error.Substring(pos + 1).Trim();
+                switch (textoError)
+                {
+                    case UNKNOW_EXCEPTION:
+                        throw new FormatNetCDFException($"El fichero {fileName} no tiene el formato correcto.");
+                    case NOTFOUND_EXCEPTION:
+                        throw new FileNetCDFNotFoundException($"El fichero {fileName} no se encuentra.");
+                }
+
+
+            }
         }
 
 
         //20190416050602+0200
         //2019 04 16 05 06 02 + 02 00
-     public static  DateTime GetDateTime(string datetime)
+        public static DateTime GetDateTime(string datetime)
         {
-            if (DateTime.TryParseExact(datetime,"yyyyMMddHHmmsszzzz", 
+            if (DateTime.TryParseExact(datetime, "yyyyMMddHHmmsszzzz",
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.AssumeLocal,
                 out DateTime ret))
@@ -103,7 +135,7 @@ namespace UploadWebApi.Infraestructura.netCDF
                 return ret;
             }
 
-            
+
 
             throw new FormatException();
         }

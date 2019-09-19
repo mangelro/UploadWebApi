@@ -18,15 +18,12 @@ namespace UploadWebApi.Infraestructura.netCDF
     /// <summary>
     /// 
     /// </summary>
-    public class NetCDFException:Exception
+    public class FormatNetCDFException: NetCDFException
     {
 
-        public NetCDFException(string message):base(message)
+        public FormatNetCDFException(string message):base(message,new FormatException(message))
         {
         }
 
-        public NetCDFException(string message,Exception innerException) : base(message, innerException)
-        {
-        }
     }
 }

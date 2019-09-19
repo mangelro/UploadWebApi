@@ -56,14 +56,15 @@ namespace UploadWebApi.Infraestructura.Web
             });
         }
 
-        public void Create(byte[] raw)
+
+        public void Create(byte[] dataRaw)
         {
             byte[] buffer = new byte[255];
 
             int leidos = 0;
             using (FileStream file = new FileStream(_tempFileName, FileMode.CreateNew, FileAccess.Write))
             {
-                using (var stream = new MemoryStream(raw, false))
+                using (var stream = new MemoryStream(dataRaw, false))
                 {
                     do
                     {

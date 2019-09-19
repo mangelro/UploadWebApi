@@ -8,11 +8,8 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UploadWebApi.Applicacion.Stores;
+//using SevenZip;
 
 namespace UploadWebApi.Infraestructura.Servicios
 {
@@ -24,18 +21,22 @@ namespace UploadWebApi.Infraestructura.Servicios
     {
         public byte[] Comprimir(byte[] rawData)
         {
-            byte[] compressed = SevenZipHelper
-                                .Compress(rawData);
+            //byte[] compressed = SevenZipHelper
+            //                    .Compress(rawData);
 
-            return compressed;
+            //return compressed;
+            throw new NotImplementedException();
         }
 
         public byte[] Descomprimir(byte[] compressData)
         {
-            byte[] decompressed = SevenZipHelper
-                                    .Decompress(compressData);
 
-            return decompressed;
+            throw new NotImplementedException();
+
+            //byte[] decompressed = SevenZipHelper
+            //                        .Decompress(compressData);
+
+            //return decompressed;
         }
     }
 }

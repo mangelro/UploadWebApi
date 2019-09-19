@@ -21,9 +21,9 @@ namespace UploadWebApi.Models
 
         string BaseUrl { get; }
 
-        public string NextPage => HasNextPage ? $"{BaseUrl}?pageNumber={(PageNumber + 1).ToString()}&pageSize={PageSize.ToString()}&orden=desc" : "#";
+        public string LinkNextPage => HasNextPage ? $"{BaseUrl}?pageNumber={(PageNumber + 1).ToString()}&pageSize={PageSize.ToString()}&orden=desc" : "#";
 
-        public string PreviousPage => HasPreviousPage ? $"{BaseUrl}?pageNumber={(PageNumber - 1).ToString()}&pageSize={PageSize.ToString()}&orden=desc" : "#";
+        public string LinkPreviousPage => HasPreviousPage ? $"{BaseUrl}?pageNumber={(PageNumber - 1).ToString()}&pageSize={PageSize.ToString()}&orden=desc" : "#";
 
         public IEnumerable<T> Rows { get; private set; }
 

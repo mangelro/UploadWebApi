@@ -45,13 +45,13 @@ namespace UploadWebApi.Applicacion.Stores
 
             string sqlString = @"INSERT INTO [inter_HuellasAceite] 
                  ([IdMuestra]
-                ,[FechaHuella]
+                ,[FechaAnalisis]
                 ,[NombreFichero]
                 ,[Hash]
                 ,[AppCliente]
                 ,[Propietario]) 
                  VALUES (@IdMuestra
-                ,@FechaHuella
+                ,@FechaAnalisis
                 ,@NombreFichero
                 ,@Hash
                 ,@AppCliente
@@ -110,12 +110,12 @@ namespace UploadWebApi.Applicacion.Stores
             sqlString.AppendFormat(@"SELECT
                  [IdHuella]
                 ,[IdMuestra]
-                ,[FechaHuella]
+                ,[FechaAnalisis]
                 ,[NombreFichero]
                 ,[Hash]
                 ,[AppCliente]
                 ,[Propietario]
-                FROM (SELECT *, ROW_NUMBER() over(PARTITION BY AppCliente ORDER BY FechaHuella {0}) RowNum 
+                FROM (SELECT *, ROW_NUMBER() over(PARTITION BY AppCliente ORDER BY FechaAnalisis {0}) RowNum 
                     FROM [inter_HuellasAceite]
                     WHERE", orden.ToString().ToUpper());
 
@@ -156,15 +156,16 @@ namespace UploadWebApi.Applicacion.Stores
             }
         }
 
-        public async Task<HuellaDto> ReadAsync(string idMuestra, Guid idUsuario,  Guid idAplicacion)
+        public async Task<HuellaDto> ReadAsync(string idMuestra, Guid idUsuario, Guid idAplicacion)
         {
             StringBuilder sqlString = new StringBuilder(@"SELECT
                   h.[IdHuella]
                 ,h.[IdMuestra]
-                ,h.[FechaHuella]
+                ,h.[FechaAnalisis]
                 ,h.[NombreFichero]
                 ,h.[Hash]
                 ,h.[AppCliente]
+                ,h.[FechaBloqueo]                
                 ,h.[Propietario]
                 ,p.[NombrePanel] NombrePropietario
                 FROM [inter_HuellasAceite] h JOIN [inter_Paneles] p ON h.Propietario=p.IdUsuario
@@ -184,6 +185,66 @@ namespace UploadWebApi.Applicacion.Stores
                 return dto;
             }
         }
+
+        public async Task<HuellaDto> ReadAsync(int idHuella)
+        {
+            StringBuilder sqlString = new StringBuilder(@"SELECT
+                  h.[IdHuella]
+                ,h.[IdMuestra]
+                ,h.[FechaAnalisis]
+                ,h.[NombreFichero]
+                ,h.[Hash]
+                ,h.[AppCliente]
+                ,h.[FechaBloqueo]                
+                ,h.[Propietario]
+                ,p.[NombrePanel] NombrePropietario
+                FROM [inter_HuellasAceite] h JOIN [inter_Paneles] p ON h.Propietario=p.IdUsuario
+                WHERE h.IdHuella=@IdHuella");
+      
+
+            using (var connection = new SqlConnection(_config.ConnectionString))
+            {
+                connection.Open();
+
+                var dto = await connection.QueryFirstOrDefaultAsync<HuellaDto>(sqlString.ToString(), new { IdHuella = idHuella});
+
+                return dto;
+            }
+        }
+ 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="idHuella"></param>
+        /// <returns></returns>
+        public async Task BloquearAsync(int idHuella,DateTime fechaBloqueo)
+        {
+            string sqlString = @"UPDATE [inter_HuellasAceite]
+                                SET [FechaBloqueo]=@Fecha,
+                                [FechaModificacionUTC]=GETUTCDATE()
+                                WHERE IdHuella=@IdHuella AND FechaBloqueo IS NULL";
+
+            using (var connection = new SqlConnection(_config.ConnectionString))
+            {
+                connection.Open();
+
+                await connection.ExecuteAsync(sqlString, new { IdHuella = idHuella, Fecha= fechaBloqueo });
+
+            }
+
+        }
+
+
+
+
+
+
+
+
+
+
+
 
         public Task<byte[]> ReadHuellaRawAsync(int idHuella)
         {

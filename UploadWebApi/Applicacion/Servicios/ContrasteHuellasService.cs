@@ -73,6 +73,8 @@ namespace UploadWebApi.Applicacion.Servicios
                 }
             }
 
+            await BloquearHuellasAsync(tConsulta1.Result.IdHuella, tConsulta2.Result.IdHuella);
+
             return new ContrasteDto {
                 FechaContraste = DateTime.UtcNow,
                 UmbralAceptacion = _conf.UmbralContraste,
@@ -94,7 +96,6 @@ namespace UploadWebApi.Applicacion.Servicios
            
         }
 
-
         async Task<CdfTempFile> CrearFicheroTemporaAsync(string idMuestra, int idHuella,string hash)
         {
 
@@ -108,6 +109,14 @@ namespace UploadWebApi.Applicacion.Servicios
 
             return tempFile;
         }
-    
+
+        public async Task BloquearHuellasAsync(int idHuella1, int idHuella2)
+        {
+            DateTime ahora = DateTime.UtcNow;
+
+            await _store.BloquearAsync(idHuella1, ahora);
+            await _store.BloquearAsync(idHuella2, ahora);
+        }
+
     }
 }
