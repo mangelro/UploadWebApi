@@ -20,6 +20,7 @@ namespace UploadWebApi.Models
         public string Hash { get; set; }
         public Guid IdRegistrador { get; set; }
         public string NombreRegistrador { get; set; }
+        public string Observaciones { get; set; }
         //public string LinkDescarga { get; set;}
     }
 }

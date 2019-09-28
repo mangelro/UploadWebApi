@@ -28,6 +28,8 @@ namespace UploadWebApi.Models
     /// </summary>
     public class ContrasteDto
     {
+        public string IdMuestra1 { get; set; }
+        public string IdMuestra2 { get; set; }
         public DateTime FechaContraste { get; set; }
         public double IndiceSimilitud { get; set; }
         public double UmbralAceptacion { get; set; }

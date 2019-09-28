@@ -23,6 +23,7 @@ namespace UploadWebApi.Models
         public Guid Propietario { get; set; }
         public string NombrePropietario { get; set; }
         public DateTime? FechaBloqueo { get; set; }
+        public string Observaciones { get; set; }
         /// <summary>
         /// 
         /// </summary>

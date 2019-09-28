@@ -9,6 +9,7 @@ using System.Web.Http;
 using System.Web.Http.Cors;
 using System.Web.Http.Description;
 using UploadWebApi.Applicacion.Servicios;
+using UploadWebApi.Infraestructura.Filtros;
 using UploadWebApi.Infraestructura.Servicios;
 using UploadWebApi.Models;
 
@@ -73,9 +74,9 @@ namespace UploadWebApi.Controllers.V1
             {
                 return BadRequest(sEx.Message);
             }
-            catch (NotFoundException noEx)
+            catch (NotFoundException exN)
             {
-                return BadRequest(noEx.Message);
+                return NotFound(exN.Message);
             }
             catch (Exception ex)
             {
@@ -112,7 +113,7 @@ namespace UploadWebApi.Controllers.V1
             }
             catch (NotFoundException noEx)
             {
-                return BadRequest(noEx.Message);
+                return NotFound(noEx.Message);
             }
             catch (Exception ex)
             {
@@ -150,7 +151,7 @@ namespace UploadWebApi.Controllers.V1
             }
             catch (NotFoundException noEx)
             {
-                return BadRequest(noEx.Message);
+                return NotFound(noEx.Message);
             }
             catch (Exception ex)
             {
@@ -162,10 +163,12 @@ namespace UploadWebApi.Controllers.V1
         [Route("")]
         [HttpPost]
         [ResponseType(typeof(GetHuellaDto))]
+        [ValidateModel]
         public async Task<IHttpActionResult> Post([FromBody] InsertHuellaDto dto)
         {
             try
             {
+
 
                 await _service.VerificarFicheroCDF(dto.Stream,dto.Hash);
 
@@ -209,7 +212,7 @@ namespace UploadWebApi.Controllers.V1
             }
             catch (NotFoundException noEx)
             {
-                return BadRequest(noEx.Message);
+                return NotFound(noEx.Message);
             }
             catch (Exception ex)
             {

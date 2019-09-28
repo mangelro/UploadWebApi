@@ -49,13 +49,15 @@ namespace UploadWebApi.Applicacion.Stores
                 ,[NombreFichero]
                 ,[Hash]
                 ,[AppCliente]
-                ,[Propietario]) 
+                ,[Propietario]
+                ,[Observaciones]) 
                  VALUES (@IdMuestra
                 ,@FechaAnalisis
                 ,@NombreFichero
                 ,@Hash
                 ,@AppCliente
-                ,@Propietario);
+                ,@Propietario
+                ,@Observaciones);
                 SELECT CAST(SCOPE_IDENTITY() as int)";
 
 
@@ -189,7 +191,7 @@ namespace UploadWebApi.Applicacion.Stores
         public async Task<HuellaDto> ReadAsync(int idHuella)
         {
             StringBuilder sqlString = new StringBuilder(@"SELECT
-                  h.[IdHuella]
+                 h.[IdHuella]
                 ,h.[IdMuestra]
                 ,h.[FechaAnalisis]
                 ,h.[NombreFichero]
@@ -197,6 +199,7 @@ namespace UploadWebApi.Applicacion.Stores
                 ,h.[AppCliente]
                 ,h.[FechaBloqueo]                
                 ,h.[Propietario]
+                ,h.[Observaciones]
                 ,p.[NombrePanel] NombrePropietario
                 FROM [inter_HuellasAceite] h JOIN [inter_Paneles] p ON h.Propietario=p.IdUsuario
                 WHERE h.IdHuella=@IdHuella");
@@ -234,16 +237,6 @@ namespace UploadWebApi.Applicacion.Stores
             }
 
         }
-
-
-
-
-
-
-
-
-
-
 
 
         public Task<byte[]> ReadHuellaRawAsync(int idHuella)

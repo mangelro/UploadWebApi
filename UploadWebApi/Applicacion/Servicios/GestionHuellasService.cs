@@ -136,6 +136,7 @@ namespace UploadWebApi.Applicacion.Servicios
                         AppCliente = idAplicacion,
                         Propietario = idUsuario,
                         Hash = dto.Hash,
+                        Observaciones=dto.Observaciones
                     };
 
                     await _store.CreateAsync(inserted, dto.Stream);

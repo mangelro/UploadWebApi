@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -20,13 +21,22 @@ namespace UploadWebApi.Models
     public class InsertHuellaDto
     {
 
+        [Required]
         public string IdMuestra { get; set; }
+
+        [Required]
         public DateTime FechaAnalisis { get; set; }
 
         public string NombreFichero { get; set; }
+
+        [Required]
+        [MinLength(50)]
         public string Hash { get; set; }
+
         [JsonConverter(typeof(ByteArrayConverter))]
         public byte[] Stream { get; set; }
-        public string ContentType { get; set; }
+
+
+        public string Observaciones { get; set; }
     }
 }

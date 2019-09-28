@@ -76,6 +76,8 @@ namespace UploadWebApi.Applicacion.Servicios
             await BloquearHuellasAsync(tConsulta1.Result.IdHuella, tConsulta2.Result.IdHuella);
 
             return new ContrasteDto {
+                IdMuestra1= idMuestra1,
+                IdMuestra2= idMuestra2,
                 FechaContraste = DateTime.UtcNow,
                 UmbralAceptacion = _conf.UmbralContraste,
                 IndiceSimilitud = indice,

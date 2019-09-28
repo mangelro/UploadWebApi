@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
-using System.Web;
+using System.Net.Http.Headers;
 using System.Web.Http;
 
 namespace UploadWebApi.Controllers.V1
@@ -20,6 +17,24 @@ namespace UploadWebApi.Controllers.V1
 
             }
         }
+
+        protected IHttpActionResult NotFound(string message)
+        {
+            {
+
+                HttpResponseMessage responseMsg = new HttpResponseMessage(HttpStatusCode.NotFound)
+                {
+                    Content = new StringContent($"{{\"message\":\"{message}\"}}")
+                };
+
+
+                responseMsg.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                return ResponseMessage(responseMsg);
+
+            }
+        }
+
 
     }
 }
