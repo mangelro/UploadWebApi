@@ -54,7 +54,7 @@ namespace UploadWebApi.Applicacion.Servicios
 
             using (var tempFile = new CdfTempFile(_conf.RutaTemporal))
             {
-                if (!_hashService.VerifyHash(hash, raw))
+                if (!_hashService.VerifyHash(raw, hash))
                     throw new ServiceException($"La verificación de firmas de la huella no es correcta.");
 
                 tempFile.Create(raw);
@@ -67,7 +67,7 @@ namespace UploadWebApi.Applicacion.Servicios
                 }
                 catch (NetCDFException ex)
                 {
-                    throw new ServiceException(ex.Message);
+                    throw new ServiceException("El fichero CDF no tiene el formato correcto.");
                 }
 
                 return Task.CompletedTask;
@@ -232,7 +232,7 @@ namespace UploadWebApi.Applicacion.Servicios
 
             byte[] huellaRaw = await _store.ReadHuellaRawAsync(huella.IdHuella);
 
-            if (!_hashService.VerifyHash(huella.Hash, huellaRaw))
+            if (!_hashService.VerifyHash(huellaRaw, huella.Hash ))
                 throw new ServiceException($"La verificación de firmas de la muestra {huella.IdMuestra} no es correcta.");
 
 

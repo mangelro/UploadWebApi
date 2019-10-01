@@ -143,7 +143,6 @@
     <Compile Include="Infraestructura\netCDF\FormatNetCDFException.cs" />
     <Compile Include="Infraestructura\netCDF\NetCDFException.cs" />
     <Compile Include="Infraestructura\netCDF\NetCDFParser.cs" />
-    <Compile Include="Infraestructura\Proceso\ProcessRunner.cs" />
     <Compile Include="Infraestructura\Servicios\CompresionServiceType.cs" />
     <Compile Include="Infraestructura\Servicios\GZipCompresionService.cs" />
     <Compile Include="Infraestructura\Servicios\SevenZipCompresionService.cs" />
@@ -207,6 +206,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\FundacionOlivar\FundacionOlivar\FundacionOlivar.csproj">
+      <Project>{0092457D-6D0D-4D65-AE56-6A0473A3E955}</Project>
+      <Name>FundacionOlivar</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

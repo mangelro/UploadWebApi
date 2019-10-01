@@ -30,7 +30,6 @@ namespace UploadWebApi.Models
         public string NombreFichero { get; set; }
 
         [Required]
-        [MinLength(50)]
         public string Hash { get; set; }
 
         [JsonConverter(typeof(ByteArrayConverter))]

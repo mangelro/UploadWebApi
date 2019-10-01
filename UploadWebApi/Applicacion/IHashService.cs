@@ -10,7 +10,7 @@ namespace UploadWebApi.Applicacion
         byte[] CalcularHash(byte[] buffer);
 
 
-        bool VerifyHash(string hashEsperado, byte[] raw);
+        bool VerifyHash(byte[] raw, string hashEsperado);
 
     }
 }

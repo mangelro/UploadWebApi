@@ -169,6 +169,7 @@ namespace UploadWebApi.Applicacion.Stores
                 ,h.[AppCliente]
                 ,h.[FechaBloqueo]                
                 ,h.[Propietario]
+                ,h.[Observaciones]
                 ,p.[NombrePanel] NombrePropietario
                 FROM [inter_HuellasAceite] h JOIN [inter_Paneles] p ON h.Propietario=p.IdUsuario
                 WHERE h.IdMuestra=@IdMuestra AND h.AppCliente=@AppCliente");

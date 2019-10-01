@@ -31,7 +31,7 @@ namespace UploadWebApi.Infraestructura.Servicios
         }
 
 
-        public bool VerifyHash(string hashEsperado, byte[] raw)
+        public bool VerifyHash(byte[] raw, string hashEsperado)
         {
             string md5Actual = Convert.ToBase64String(CalcularHash(raw));
             return hashEsperado.Equals(md5Actual, StringComparison.InvariantCulture);

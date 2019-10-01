@@ -8,14 +8,9 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Transactions;
+using FundacionOlivar.Procesos;
 using UploadWebApi.Applicacion.Stores;
-using UploadWebApi.Infraestructura.Proceso;
 using UploadWebApi.Infraestructura.Web;
 using UploadWebApi.Models;
 
@@ -104,7 +99,7 @@ namespace UploadWebApi.Applicacion.Servicios
             var tempFile = new CdfTempFile(_conf.RutaTemporal);
 
             byte[] raw = await _store.ReadHuellaRawAsync(idHuella);
-            if (!_hashService.VerifyHash(hash, raw))
+            if (!_hashService.VerifyHash(raw, hash))
                 throw new ServiceException($"La verificación de firmas de la muestra {idMuestra} no es correcta.");
 
             tempFile.Create(raw);

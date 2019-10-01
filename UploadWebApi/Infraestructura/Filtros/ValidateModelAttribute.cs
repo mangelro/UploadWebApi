@@ -31,7 +31,7 @@ namespace UploadWebApi.Infraestructura.Filtros
                 var error= actionContext.ModelState.Values.SelectMany(v => v.ToString()).ToString();
 
                 actionContext.Response = actionContext.Request.CreateErrorResponse(
-                    HttpStatusCode.BadRequest, actionContext.ModelState);
+                    HttpStatusCode.BadRequest,"Petición incorrecta");
             }
         }
 
