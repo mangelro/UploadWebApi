@@ -29,14 +29,27 @@ namespace UploadWebApi.Infraestructura.Filtros
         {
             if (!actionContext.ModelState.IsValid)
             {
-                var errores =actionContext.ModelState.Values.SelectMany(e => e.Errors).Select(v => v.ErrorMessage);
-                using(var w=new StringWriter())
+                var excepciones = actionContext.ModelState.Values.SelectMany(v => v.Errors).Select(e=>e.Exception).Where(e=>e!=null);
+                var errores = actionContext.ModelState.Values.SelectMany(e => e.Errors).Select(v => v.ErrorMessage);
+
+                if (excepciones.Any())
                 {
-                    Newtonsoft.Json.JsonSerializer.Create().Serialize( w, errores);
-                    actionContext.Response = actionContext.Request.CreateErrorResponse(
-                        HttpStatusCode.BadRequest, w.ToString());
+                    using (var w = new StringWriter())
+                    {
+                        Newtonsoft.Json.JsonSerializer.Create().Serialize(w, excepciones.Select(m => m.Message).ToArray());
+                        actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.BadRequest, w.ToString());
+                    }
 
                 }
+                else if (errores.Any())
+                {
+                    using (var w = new StringWriter())
+                    {
+                        Newtonsoft.Json.JsonSerializer.Create().Serialize(w, errores.ToArray());
+                        actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.BadRequest, w.ToString());
+                    }
+                }
+
 
 
             }

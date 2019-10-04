@@ -124,6 +124,7 @@ namespace UploadWebApi.Applicacion.Servicios
             try
             {
                 HuellaDto inserted = null;
+
                 using (TransactionScope tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
 
@@ -146,10 +147,10 @@ namespace UploadWebApi.Applicacion.Servicios
                     CrearFichero(dto.Stream, Path.Combine(fileuploadPath, GetFormatoNombre(dto.NombreFichero, inserted.IdHuella)));
                     
                     tran.Complete();
-
-                    return _mapperService.Map<HuellaDto, GetHuellaDto>(inserted);
-
                 }//using trans
+                
+                //return _mapperService.Map<HuellaDto, GetHuellaDto>(inserted);
+                return await ConsultarHuellaAsync(inserted.IdMuestra, inserted.AppCliente);
             }
             catch (IOException)
             {
