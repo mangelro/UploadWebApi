@@ -174,7 +174,7 @@ namespace UploadWebApi.Controllers.V1
 
                 var inserted = await _service.CrearRegistroHuellaAsync(dto, _identity.UserIdentity, _identity.AppIdentity);
 
-                return Created(CurrentUrl() + "/" + inserted.IdMuestra, inserted);
+                return Created(CurrentUrl() +  inserted.IdMuestra, inserted);
             }
             catch (ServiceException sEx)
             {
@@ -222,12 +222,18 @@ namespace UploadWebApi.Controllers.V1
 
 
         /// <summary>
-        /// 
+        /// URL de la petición
         /// </summary>
         /// <returns></returns>
-        string CurrentUrl() => Request.RequestUri.ToString().Split('?')[0];
-        
+        string CurrentUrl() {
 
+            var url = Request.RequestUri.ToString().Split('?')[0];
+
+            if (!url.EndsWith("/"))
+                url = url + "/";
+
+            return url;
+        }
 
     }
     

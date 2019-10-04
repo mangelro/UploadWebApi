@@ -13,6 +13,7 @@ using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using System.Linq;
+using System.IO;
 
 namespace UploadWebApi.Infraestructura.Filtros
 {
@@ -28,10 +29,16 @@ namespace UploadWebApi.Infraestructura.Filtros
         {
             if (!actionContext.ModelState.IsValid)
             {
-                var error= actionContext.ModelState.Values.SelectMany(v => v.ToString()).ToString();
+                var errores =actionContext.ModelState.Values.SelectMany(e => e.Errors).Select(v => v.ErrorMessage);
+                using(var w=new StringWriter())
+                {
+                    Newtonsoft.Json.JsonSerializer.Create().Serialize( w, errores);
+                    actionContext.Response = actionContext.Request.CreateErrorResponse(
+                        HttpStatusCode.BadRequest, w.ToString());
 
-                actionContext.Response = actionContext.Request.CreateErrorResponse(
-                    HttpStatusCode.BadRequest,"Petición incorrecta");
+                }
+
+
             }
         }
 

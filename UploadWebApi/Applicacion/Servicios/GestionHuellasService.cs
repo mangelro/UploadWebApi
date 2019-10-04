@@ -159,6 +159,10 @@ namespace UploadWebApi.Applicacion.Servicios
             {
                 throw new ServiceException(ex.Message);
             }
+            catch (MuestraDuplicadaException dEx)
+            {
+                throw new ServiceException(dEx.Message);
+            }
 
         }
 

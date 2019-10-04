@@ -82,6 +82,11 @@ namespace UploadWebApi.Applicacion.Stores
             {
                 System.Diagnostics.Debug.Write("[DapperHuellasStore.CreateAsync] " + ex.Message);
             }
+            catch (SqlException sqlEx) when (sqlEx.Number == 2627)
+            {
+                //Infraccion de unique key IX_inter_HuellasAceite
+                throw new MuestraDuplicadaException($"La muestra {huella.IdMuestra} ya existe en el sistema.");
+            }
         }
 
         public async Task DeleteAsync(int idHuella)

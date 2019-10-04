@@ -134,6 +134,7 @@
     <Compile Include="Applicacion\Servicios\GestionHuellasService.cs" />
     <Compile Include="Applicacion\Servicios\IConfiguracionRegistros.cs" />
     <Compile Include="Applicacion\Stores\IFiltroCompresion.cs" />
+    <Compile Include="Applicacion\Stores\MuestraDuplicadaException.cs" />
     <Compile Include="Infraestructura\Configuracion\ConfigurationManagerHelper.cs" />
     <Compile Include="Infraestructura\Filtros\ValidateModelAttribute.cs" />
     <Compile Include="Infraestructura\Mapeador\AutoMapperAdapter.cs" />

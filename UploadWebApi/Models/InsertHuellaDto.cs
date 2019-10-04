@@ -27,11 +27,13 @@ namespace UploadWebApi.Models
         [Required]
         public DateTime FechaAnalisis { get; set; }
 
+        [Required]
         public string NombreFichero { get; set; }
 
         [Required]
         public string Hash { get; set; }
 
+        [Required]
         [JsonConverter(typeof(ByteArrayConverter))]
         public byte[] Stream { get; set; }
 
