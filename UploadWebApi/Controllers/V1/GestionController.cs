@@ -9,22 +9,24 @@ using System.Web.Http;
 using System.Web.Http.Cors;
 using System.Web.Http.Description;
 
-using UploadWebApi.Applicacion.Servicios;
+using FundacionOlivar.Web.Modelos;
+
+using UploadWebApi.Aplicacion.Excepciones;
+using UploadWebApi.Aplicacion.Servicios;
+using UploadWebApi.Infraestructura.Datos.Excepciones;
+using UploadWebApi.Infraestructura.Extensiones;
 using UploadWebApi.Infraestructura.Filtros;
-using UploadWebApi.Infraestructura.Servicios;
 using UploadWebApi.Models;
 
 namespace UploadWebApi.Controllers.V1
 {
 
-    //[Authorize(Roles = "administradores,laboratorios,contrastadores")]
-    [Authorize]
+    [Authorize(Roles = "administradores,laboratorios,contrastadores")]
+    //[Authorize]
     [RoutePrefix("v1/gestion")]
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class GestionController : BaseApiController
     {
-        const string ROL_CONTRASTADOR = "contrastadores";
-
         readonly GestionHuellasService _service;
         readonly IIdentityService _identity;
 
@@ -37,18 +39,35 @@ namespace UploadWebApi.Controllers.V1
         [HttpGet]
         [Route("")]
         [ResponseType(typeof(PaginatedList<GetRowHuellaDto>))]
-        public async Task<IHttpActionResult> Get(int pageNumber = 1,int pageSize=10,string orden="desc")
+        public async Task<IHttpActionResult> Get(int pageNumber = 1,int pageSize=10, OrdenType orden= OrdenType.DESC)
         {
             try
             {
                 Tuple<IEnumerable<GetRowHuellaDto>, int> resul = null;
 
-                if (_identity.IsSysAdmin || _identity.Roles.Where(r => r == ROL_CONTRASTADOR).Any())
-                    resul = await _service.ConsultarHuellasAsync(pageNumber, pageSize, _identity.AppIdentity, orden);
-                else
-                    resul = await _service.ConsultarHuellasAsync(pageNumber, pageSize, _identity.UserIdentity, _identity.AppIdentity, orden);
+                RangoPaginacion rangoPaginacion = new RangoPaginacion(pageNumber, pageSize);
 
-                return Ok(new PaginatedList<GetRowHuellaDto>(CurrentUrl(), resul.Item1,pageNumber,pageSize,resul.Item2));
+                //if (_identity.IsSysAdmin || _identity.Roles.Where(r => r == ROL_CONTRASTADOR).Any())
+                //    resul = await _service.ConsultarHuellasAsync(rangoPaginacion, _identity.AppIdentity, orden);
+                //else
+                //resul = await _service.ConsultarHuellasAsync(rangoPaginacion, _identity.UserIdentity, _identity.AppIdentity, orden);
+
+                resul = await _service.ConsultarHuellasAsync(rangoPaginacion, orden);
+
+                var paginacion = new PaginatedList<GetRowHuellaDto>(resul.Item1, pageNumber, pageSize, resul.Item2);
+
+                //Link de pagina anterior
+                if (paginacion.HasPreviousPage)
+                    paginacion.Links.PreviousPage = GetLinkNewPage(pageNumber - 1);
+
+
+                //Link de pagina siguiente
+                if (paginacion.HasNextPage)
+                    paginacion.Links.NextPage = GetLinkNewPage(pageNumber + 1);
+
+
+
+                return Ok(paginacion);
             }
             catch (ServiceException sEx)
             {
@@ -61,22 +80,21 @@ namespace UploadWebApi.Controllers.V1
         }
 
         [HttpGet]
-        [Route("{idMuestra}")]
+        [Route("{idMuestra}",Name = "GetHuellaById")]
         [ResponseType(typeof(GetHuellaDto))]
         public async Task<IHttpActionResult> Get(string idMuestra)
         {
             try
             {
-                var huella = await _service.ConsultarHuellaAsync(idMuestra, _identity.AppIdentity);
-
-                //huella.LinkDescarga = CurrentUrl() + huella.LinkDescarga;
+                var huella = await _service.ConsultarHuellaAsync(idMuestra);
+                huella.LinkDescarga = GetLinkDescarga(huella.IdHuella);
                 return Ok(huella);
             }
             catch (ServiceException sEx)
             {
                 return BadRequest(sEx.Message);
             }
-            catch (NotFoundException exN)
+            catch (IdNoEncontradaException exN)
             {
                 return NotFound(exN.Message);
             }
@@ -85,8 +103,7 @@ namespace UploadWebApi.Controllers.V1
                 return InternalServerError(ex);
             }
         }
-
-
+        
         [HttpGet]
         [Route("{idMuestra}/download")]
         public async Task<IHttpActionResult> Download(string idMuestra)
@@ -99,7 +116,7 @@ namespace UploadWebApi.Controllers.V1
 
                 HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    Content = new StreamContent(dataStream.Raw)
+                    Content = new StreamContent(dataStream.FileStream)
                 };
                 response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
                 {
@@ -113,7 +130,7 @@ namespace UploadWebApi.Controllers.V1
             {
                 return BadRequest(sEx.Message);
             }
-            catch (NotFoundException noEx)
+            catch (IdNoEncontradaException noEx)
             {
                 return NotFound(noEx.Message);
             }
@@ -122,8 +139,7 @@ namespace UploadWebApi.Controllers.V1
                 return InternalServerError(ex);
             }
         }
-
-
+        
         [HttpGet]
         [Route("{idMuestra}/{idHuella:int}/download")]
         [AllowAnonymous]
@@ -137,7 +153,7 @@ namespace UploadWebApi.Controllers.V1
 
                 HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    Content = new StreamContent(dataStream.Raw)
+                    Content = new StreamContent(dataStream.FileStream)
                 };
                 response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
                 {
@@ -151,7 +167,7 @@ namespace UploadWebApi.Controllers.V1
             {
                 return BadRequest(sEx.Message);
             }
-            catch (NotFoundException noEx)
+            catch (IdNoEncontradaException noEx)
             {
                 return NotFound(noEx.Message);
             }
@@ -160,23 +176,31 @@ namespace UploadWebApi.Controllers.V1
                 return InternalServerError(ex);
             }
         }
-
-
+        
         [Route("")]
         [HttpPost]
         [ResponseType(typeof(GetHuellaDto))]
         [ValidateModel]
         public async Task<IHttpActionResult> Post([FromBody] InsertHuellaDto dto)
         {
+
+            if (!ModelState.IsValid)
+            {
+                var errorModel = ModelState.MensajesError();
+                var response = Request.CreateErrorResponse(HttpStatusCode.BadRequest, String.Join(",", errorModel.ToArray()));
+                return ResponseMessage(response);
+            }
+
             try
             {
 
-
-                await _service.VerificarFicheroCDF(dto.Stream,dto.Hash);
+                await _service.VerificarFichero(dto.FileStream,dto.Hash);
 
                 var inserted = await _service.CrearRegistroHuellaAsync(dto, _identity.UserIdentity, _identity.AppIdentity);
 
-                return Created(CurrentUrl() +  inserted.IdMuestra, inserted);
+                string uri = Url.Link("GetHuellaById", new { idMuestra = dto.IdMuestra });
+
+                return Created(uri, inserted);
             }
             catch (ServiceException sEx)
             {
@@ -187,8 +211,7 @@ namespace UploadWebApi.Controllers.V1
                 return InternalServerError(ex);
             }
         }
-
-
+        
         [HttpDelete]
         [Route("{idMuestra}")]
         public async Task<IHttpActionResult> Delete(string idMuestra)
@@ -212,7 +235,7 @@ namespace UploadWebApi.Controllers.V1
             {
                 return BadRequest(sEx.Message);
             }
-            catch (NotFoundException noEx)
+            catch (IdNoEncontradaException noEx)
             {
                 return NotFound(noEx.Message);
             }
@@ -221,22 +244,6 @@ namespace UploadWebApi.Controllers.V1
                 return InternalServerError(ex);
             }
         }
-
-
-        /// <summary>
-        /// URL de la petición
-        /// </summary>
-        /// <returns></returns>
-        string CurrentUrl() {
-
-            var url = Request.RequestUri.ToString().Split('?')[0];
-
-            if (!url.EndsWith("/"))
-                url = url + "/";
-
-            return url;
-        }
-
-    }
     
+    }
 }

@@ -13,18 +13,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UploadWebApi.Applicacion.Servicios
+namespace UploadWebApi.Aplicacion.Excepciones
 {
     /// <summary>
-    /// Excepción que se produce cuando no existe la entidad en el sistema
+    /// 
     /// </summary>
-    public class NotFoundException : Exception
+    public class ServiceException: Exception
     {
 
-        public NotFoundException(string message) : base(message)
+        public ServiceException(string message) : base(message)
         { }
 
-        public NotFoundException(string message, Exception innerException) : base(message, innerException)
+        public ServiceException(string message, Exception innerException) : base(message, innerException)
         { }
     }
 }

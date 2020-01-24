@@ -7,20 +7,33 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UploadWebApi", "UploadWebAp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FundacionOlivar", "..\FundacionOlivar\FundacionOlivar\FundacionOlivar.csproj", "{0092457D-6D0D-4D65-AE56-6A0473A3E955}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FundacionOlivar.Web", "..\FundacionOlivar\FundacionOlivar.Web\FundacionOlivar.Web.csproj", "{794E492C-4B9C-4396-9167-99D424AC840A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Solo API|Any CPU = Solo API|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{D9B0D8DF-95B3-407F-9254-2D2CC633273C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D9B0D8DF-95B3-407F-9254-2D2CC633273C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9B0D8DF-95B3-407F-9254-2D2CC633273C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9B0D8DF-95B3-407F-9254-2D2CC633273C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9B0D8DF-95B3-407F-9254-2D2CC633273C}.Solo API|Any CPU.ActiveCfg = Release|Any CPU
+		{D9B0D8DF-95B3-407F-9254-2D2CC633273C}.Solo API|Any CPU.Build.0 = Release|Any CPU
 		{0092457D-6D0D-4D65-AE56-6A0473A3E955}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0092457D-6D0D-4D65-AE56-6A0473A3E955}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0092457D-6D0D-4D65-AE56-6A0473A3E955}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0092457D-6D0D-4D65-AE56-6A0473A3E955}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0092457D-6D0D-4D65-AE56-6A0473A3E955}.Solo API|Any CPU.ActiveCfg = Release|Any CPU
+		{0092457D-6D0D-4D65-AE56-6A0473A3E955}.Solo API|Any CPU.Build.0 = Release|Any CPU
+		{794E492C-4B9C-4396-9167-99D424AC840A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{794E492C-4B9C-4396-9167-99D424AC840A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{794E492C-4B9C-4396-9167-99D424AC840A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{794E492C-4B9C-4396-9167-99D424AC840A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{794E492C-4B9C-4396-9167-99D424AC840A}.Solo API|Any CPU.ActiveCfg = Solo API|Any CPU
+		{794E492C-4B9C-4396-9167-99D424AC840A}.Solo API|Any CPU.Build.0 = Solo API|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

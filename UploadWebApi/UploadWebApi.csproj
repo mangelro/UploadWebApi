@@ -127,17 +127,18 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Applicacion\IHashService.cs" />
-    <Compile Include="Applicacion\Mapeado\IMapperService.cs" />
-    <Compile Include="Applicacion\Servicios\ConfiguracionRegistro.cs" />
-    <Compile Include="Applicacion\Servicios\ContrasteHuellasService.cs" />
-    <Compile Include="Applicacion\Servicios\GestionHuellasService.cs" />
-    <Compile Include="Applicacion\Servicios\IConfiguracionRegistros.cs" />
-    <Compile Include="Applicacion\Stores\IFiltroCompresion.cs" />
-    <Compile Include="Applicacion\Stores\MuestraDuplicadaException.cs" />
+    <Compile Include="Aplicacion\Servicios\IHashService.cs" />
+    <Compile Include="Aplicacion\Mapeado\IMapperService.cs" />
+    <Compile Include="Infraestructura\Configuracion\ConfiguracionRegistro.cs" />
+    <Compile Include="Aplicacion\Servicios\ContrasteHuellasService.cs" />
+    <Compile Include="Aplicacion\Servicios\GestionHuellasService.cs" />
+    <Compile Include="Aplicacion\Servicios\IConfiguracionRegistros.cs" />
+    <Compile Include="Infraestructura\Compresion\IFiltroCompresion.cs" />
+    <Compile Include="Infraestructura\Datos\Excepciones\MuestraDuplicadaException.cs" />
     <Compile Include="Controllers\V2\UploadController.cs" />
     <Compile Include="Infraestructura\Binding\FormMultipartEncodedMediaTypeFormatter.cs" />
     <Compile Include="Infraestructura\Configuracion\ConfigurationManagerHelper.cs" />
+    <Compile Include="Infraestructura\Extensiones\IdentityServiceExtensions.cs" />
     <Compile Include="Infraestructura\Extensiones\ModelStateExtensions.cs" />
     <Compile Include="Infraestructura\Extensiones\StreamExtensions.cs" />
     <Compile Include="Infraestructura\Filtros\ValidateModelAttribute.cs" />
@@ -149,17 +150,17 @@
     <Compile Include="Infraestructura\netCDF\NetCDFException.cs" />
     <Compile Include="Infraestructura\netCDF\NetCDFParser.cs" />
     <Compile Include="Infraestructura\Serializacion\Base64FileConverter.cs" />
-    <Compile Include="Infraestructura\Servicios\CompresionServiceType.cs" />
-    <Compile Include="Infraestructura\Servicios\GZipCompresionService.cs" />
-    <Compile Include="Infraestructura\Servicios\SevenZipCompresionService.cs" />
-    <Compile Include="Infraestructura\Servicios\FakeCompresionService.cs" />
+    <Compile Include="Infraestructura\Compresion\CompresionServiceType.cs" />
+    <Compile Include="Infraestructura\Compresion\GZipCompresionService.cs" />
+    <Compile Include="Infraestructura\Compresion\SevenZipCompresionService.cs" />
+    <Compile Include="Infraestructura\Compresion\FakeCompresionService.cs" />
     <Compile Include="Infraestructura\Servicios\MD5HashService.cs" />
-    <Compile Include="Applicacion\Servicios\NotFoundException.cs" />
-    <Compile Include="Applicacion\Servicios\ServiceException.cs" />
-    <Compile Include="Applicacion\Stores\DapperHuellasStore.cs" />
-    <Compile Include="Applicacion\Stores\IHuellasStore.cs" />
-    <Compile Include="Applicacion\Stores\IStoreConfiguration.cs" />
-    <Compile Include="Infraestructura\Configuracion\StoreConfiguration .cs" />
+    <Compile Include="Infraestructura\Datos\Excepciones\IdNotFoundException.cs" />
+    <Compile Include="Aplicacion\Excepciones\ServiceException.cs" />
+    <Compile Include="Infraestructura\Datos\DapperHuellaAceiteStore.cs" />
+    <Compile Include="Aplicacion\Stores\IHuellaAceiteStore.cs" />
+    <Compile Include="Aplicacion\Stores\IStoreConfiguration.cs" />
+    <Compile Include="Infraestructura\Datos\Configuracion\StoreConfiguration .cs" />
     <Compile Include="App_Start\AutofacWebApiConfig.cs" />
     <Compile Include="App_Start\Startup.auth.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
@@ -171,8 +172,8 @@
     <Compile Include="Infraestructura\Extensiones\IdentityExtensions.cs" />
     <Compile Include="Infraestructura\Seguridad\ClaimTypes.cs" />
     <Compile Include="Infraestructura\Serializacion\Base64ArrayConverter.cs" />
-    <Compile Include="Infraestructura\Servicios\IIdentityService.cs" />
-    <Compile Include="Infraestructura\Servicios\impl\IdentityService.cs" />
+    <Compile Include="Aplicacion\Servicios\IIdentityService.cs" />
+    <Compile Include="Infraestructura\Servicios\IdentityService.cs" />
     <Compile Include="Infraestructura\SqlBinaryStream\IBinaryData.cs" />
     <Compile Include="Infraestructura\SqlBinaryStream\SqlBinaryData.cs" />
     <Compile Include="Infraestructura\SqlBinaryStream\SqlBinaryInfo.cs" />
@@ -185,11 +186,10 @@
     <Compile Include="Infraestructura\Web\QueryStringHelper.cs" />
     <Compile Include="Models\ContrasteDto.cs" />
     <Compile Include="Models\GetHuellaDto.cs" />
-    <Compile Include="Models\HuellaDto.cs" />
+    <Compile Include="Aplicacion\Modelo\HuellaAceite.cs" />
     <Compile Include="Models\GetRowHuellaDto.cs" />
     <Compile Include="Models\InsertHuellaDto.cs" />
     <Compile Include="Models\BlobDto.cs" />
-    <Compile Include="Models\PaginatedList.cs" />
     <Compile Include="Models\UploadMuestraV2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -217,6 +217,10 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\FundacionOlivar\FundacionOlivar.Web\FundacionOlivar.Web.csproj">
+      <Project>{794e492c-4b9c-4396-9167-99d424ac840a}</Project>
+      <Name>FundacionOlivar.Web</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\FundacionOlivar\FundacionOlivar\FundacionOlivar.csproj">
       <Project>{0092457D-6D0D-4D65-AE56-6A0473A3E955}</Project>
       <Name>FundacionOlivar</Name>

@@ -1,17 +1,12 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Web;
 using System.Web.Http;
 using System.Web.Http.Cors;
 
-using Newtonsoft.Json;
-
-using UploadWebApi.Applicacion;
+using UploadWebApi.Aplicacion.Servicios;
 using UploadWebApi.Infraestructura.Extensiones;
-using UploadWebApi.Infraestructura.Serializacion;
 using UploadWebApi.Models;
 
 namespace UploadWebApi.Controllers.V2
@@ -43,9 +38,7 @@ namespace UploadWebApi.Controllers.V2
                 return ResponseMessage(response);
             }
 
-
-
-            if (!_hashService.VerifyHash(upload.VectorDatos.InputStream.ToArray(), upload.Hash))
+            if (!_hashService.VerifyHash(upload.VectorDatos.InputStream, upload.Hash))
             {
                 var response = Request.CreateErrorResponse(HttpStatusCode.BadRequest, "La validación HASH es errónea");
                 return ResponseMessage(response);

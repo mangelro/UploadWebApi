@@ -90,10 +90,6 @@ namespace UploadWebApi.Infraestructura.Extensiones
             }
         }
 
-
-
-
-
         public static Guid GetUserId(this IIdentity _identity)
         {
             Guid retVal = Guid.Empty;

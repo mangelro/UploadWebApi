@@ -1,6 +1,8 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text.RegularExpressions;
 using System.Web.Http;
 
 namespace UploadWebApi.Controllers
@@ -36,5 +38,39 @@ namespace UploadWebApi.Controllers
         }
 
 
+
+        /// <summary>
+        /// Reemplaza el número de pagina en la url de paginación
+        /// </summary>
+        /// <param name="newNumPage"></param>
+        /// <returns></returns>
+        protected string GetLinkNewPage(int newNumPage)
+        {
+
+            if (newNumPage <= 0)
+            {
+                throw new ArgumentException("El número de página ha de ser mayor que cero.");
+            }
+
+
+            var baseUrl = Request.RequestUri.GetLeftPart(UriPartial.Path);
+            var query = Request.RequestUri.GetComponents(UriComponents.Query, UriFormat.UriEscaped);
+
+
+            var newQuery = Regex.Replace(query, @"([?&]pageIndex)=[^?&]+", $"$1={newNumPage}");
+
+            return baseUrl + "?" + newQuery;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="IdHuella"></param>
+        /// <returns></returns>
+        protected string GetLinkDescarga(int IdHuella)
+        {
+            var baseUrl = Request.RequestUri.GetLeftPart(UriPartial.Path);
+            return $"{baseUrl}/{IdHuella.ToString()}/download";
+        }
     }
 }

@@ -10,20 +10,20 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
-using UploadWebApi.Applicacion.Mapeado;
-using UploadWebApi.Applicacion.Stores;
-using UploadWebApi.Infraestructura.netCDF;
-using UploadWebApi.Infraestructura.Web;
+using FundacionOlivar.Validacion;
+using FundacionOlivar.Web.Modelos;
+
+using UploadWebApi.Aplicacion.Mapeado;
+using UploadWebApi.Aplicacion.Stores;
+using UploadWebApi.Aplicacion.Modelo;
+using UploadWebApi.Aplicacion.Excepciones;
 using UploadWebApi.Models;
 
-namespace UploadWebApi.Applicacion.Servicios
+namespace UploadWebApi.Aplicacion.Servicios
 {
-
-
-
-
     /// <summary>
     /// 
     /// </summary>
@@ -31,16 +31,19 @@ namespace UploadWebApi.Applicacion.Servicios
     {
 
         readonly IConfiguracionRegistros _conf;
-        readonly IHuellasStore _store;
+        readonly IHuellaAceiteStore _store;
         readonly IHashService _hashService;
         readonly IMapperService _mapperService;
+        readonly IIdentityService _identityService;
 
-        public GestionHuellasService(IConfiguracionRegistros config, IHuellasStore store, IHashService hashService, IMapperService mapperService)
+        public GestionHuellasService(IConfiguracionRegistros config, IHuellaAceiteStore store, IHashService hashService, IMapperService mapperService, IIdentityService identityService)
         {
-            _conf = config ?? throw new ArgumentNullException(nameof(config));
-            _store = store ?? throw new ArgumentNullException(nameof(store));
-            _hashService = hashService ?? throw new ArgumentNullException(nameof(hashService));
-            _mapperService = mapperService ?? throw new ArgumentNullException(nameof(mapperService));
+            _conf = config.ThrowIfNull(nameof(config));
+            _store = store.ThrowIfNull(nameof(store));
+            _hashService = hashService.ThrowIfNull(nameof(hashService));
+            _identityService = identityService.ThrowIfNull(nameof(identityService));
+            _mapperService = mapperService.ThrowIfNull(nameof(mapperService));
+
         }
 
         /// <summary>
@@ -49,50 +52,44 @@ namespace UploadWebApi.Applicacion.Servicios
         /// <param name="raw"></param>
         /// <param name="hash"></param>
         /// <returns></returns>
-        public Task VerificarFicheroCDF(byte[] raw, string hash)
+        public Task VerificarFichero(Stream rawFile, string hash)
         {
 
-            using (var tempFile = new CdfTempFile(_conf.RutaTemporal))
-            {
-                if (!_hashService.VerifyHash(raw, hash))
-                    throw new ServiceException($"La verificación de firmas de la huella no es correcta.");
+            if (!_hashService.VerifyHash(rawFile, hash))
+                throw new ServiceException($"La verificación de firmas de la huella no es correcta.");
 
-                tempFile.Create(raw);
 
-                var parser = new NetCDFParser(new NetCDFConfig());
+            //using (var tempFile = new CdfTempFile(_conf.RutaTemporal))
+            //{
 
-                try
-                {
-                    parser.Procesar(tempFile.TempFileName);
-                }
-                catch (NetCDFException ex)
-                {
-                    throw new ServiceException("El fichero CDF no tiene el formato correcto.");
-                }
+            //    tempFile.Create(rawFile);
 
-                return Task.CompletedTask;
-            }
+            //    var parser = new NetCDFParser(new NetCDFConfig());
+
+            //    try
+            //    {
+            //        parser.Procesar(tempFile.TempFileName);
+            //    }
+            //    catch (NetCDFException ex)
+            //    {
+            //        throw new ServiceException("El fichero CDF no tiene el formato correcto.");
+            //    }
+
+            //    return Task.CompletedTask;
+            //}
+
+            return Task.CompletedTask;
         }
 
-        public async Task<Tuple<IEnumerable<GetRowHuellaDto>, int>> ConsultarHuellasAsync(int pageNumber, int pageSize, Guid idAplicacion, string orden)
+        public async Task<Tuple<IEnumerable<GetRowHuellaDto>, int>> ConsultarHuellasAsync(RangoPaginacion paginacion, OrdenType orden)
         {
-
-
-            return await ConsultarHuellasAsync(pageNumber, pageSize, Guid.Empty, idAplicacion, orden);
-        }
-
-        public async Task<Tuple<IEnumerable<GetRowHuellaDto>, int>> ConsultarHuellasAsync(int pageNumber, int pageSize, Guid idUsuario, Guid idAplicacion, string orden)
-        {
-
             try
             {
+                var huellas = await _store.ReadAllAsync(paginacion, _identityService.UserIdentity, _identityService.AppIdentity, orden);
 
-                OrdenListatoTipo tipoOrden = (OrdenListatoTipo)Enum.Parse(typeof(OrdenListatoTipo), orden.ToUpper());
+                var dtos = huellas.Item1.Select(h => _mapperService.Map<HuellaAceite, GetRowHuellaDto>(h));
 
-                var tupla = await _store.ReadAllAsync(pageNumber, pageSize, idUsuario, idAplicacion, tipoOrden);
-
-                return Tuple.Create<IEnumerable<GetRowHuellaDto>, int>(_mapperService.Map<HuellaDto, GetRowHuellaDto>(tupla.Item1), tupla.Item2);
-
+                return Tuple.Create<IEnumerable<GetRowHuellaDto>, int>(dtos, huellas.Item2);
             }
             catch (ArgumentException ex)
             {
@@ -100,21 +97,15 @@ namespace UploadWebApi.Applicacion.Servicios
             }
         }
 
-        public async Task<GetHuellaDto> ConsultarHuellaAsync(string idMuestra, Guid idAplicacion)
+        public async Task<GetHuellaDto> ConsultarHuellaAsync(string idMuestra)
         {
-            return await ConsultarHuellaAsync(idMuestra, Guid.Empty, idAplicacion);
-        }
-
-        public async Task<GetHuellaDto> ConsultarHuellaAsync(string idMuestra, Guid idUsuario, Guid idAplicacion)
-        {
-            var huella = await _store.ReadAsync(idMuestra, idUsuario, idAplicacion);
-
-            ThrowIfNull(idMuestra, huella);
 
 
-            var dto = _mapperService.Map<HuellaDto, GetHuellaDto>(huella);
+            //Si se trata de un usuario Administrador puede acceder a todas
+            //las de la APP
+            var huella = await _store.ReadAsync(idMuestra, _identityService.IsSysAdmin? Guid.Empty : _identityService.UserIdentity, _identityService.AppIdentity);
 
-            //dto.LinkDescarga = $"/{huella.IdHuella}/download";
+            var dto = _mapperService.Map<HuellaAceite, GetHuellaDto>(huella);
 
             return dto;
         }
@@ -123,13 +114,13 @@ namespace UploadWebApi.Applicacion.Servicios
         {
             try
             {
-                HuellaDto inserted = null;
+                HuellaAceite inserted = null;
 
                 using (TransactionScope tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
 
 
-                    inserted = new HuellaDto
+                    inserted = new HuellaAceite
                     {
                         IdMuestra = dto.IdMuestra,
                         NombreFichero = dto.NombreFichero,
@@ -137,20 +128,19 @@ namespace UploadWebApi.Applicacion.Servicios
                         AppCliente = idAplicacion,
                         Propietario = idUsuario,
                         Hash = dto.Hash,
-                        Observaciones=dto.Observaciones
+                        Observaciones = dto.Observaciones
                     };
 
-                    await _store.CreateAsync(inserted, dto.Stream);
+                    await _store.CreateAsync(inserted, dto.FileStream);
 
                     var fileuploadPath = _conf.RutaFicheros;
 
-                    CrearFichero(dto.Stream, Path.Combine(fileuploadPath, GetFormatoNombre(dto.NombreFichero, inserted.IdHuella)));
-                    
+                    CrearFichero(dto.FileStream, Path.Combine(fileuploadPath, GetFormatoNombre(dto.NombreFichero, inserted.IdHuella)));
+
                     tran.Complete();
                 }//using trans
-                
-                //return _mapperService.Map<HuellaDto, GetHuellaDto>(inserted);
-                return await ConsultarHuellaAsync(inserted.IdMuestra, inserted.AppCliente);
+
+                return _mapperService.Map<HuellaAceite,GetHuellaDto>(await _store.ReadAsync(inserted.IdHuella));
             }
             catch (IOException)
             {
@@ -160,26 +150,19 @@ namespace UploadWebApi.Applicacion.Servicios
             {
                 throw new ServiceException(ex.Message);
             }
-            catch (MuestraDuplicadaException dEx)
-            {
-                throw new ServiceException(dEx.Message);
-            }
 
         }
 
         public async Task BorrarRegistroHuellaAsync(string idMuestra, Guid idUSuario, Guid idAplicacion, bool forzarBorrado)
         {
 
-            HuellaDto huella = null;
+            HuellaAceite huella = null;
 
             try
             {
                 using (TransactionScope tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
                     huella = await _store.ReadAsync(idMuestra, idUSuario, idAplicacion);
-
-                    ThrowIfNull(idMuestra, huella);
-
 
                     if (huella.EstaBloqueada && !forzarBorrado)
                     {
@@ -211,8 +194,6 @@ namespace UploadWebApi.Applicacion.Servicios
         {
             var huella = await _store.ReadAsync(idMuestra, Guid.Empty, idApplicacion);
 
-            ThrowIfNull(idMuestra, huella);
-
             return await DownloadHuellaInternalAsync(huella);
         }
 
@@ -220,8 +201,6 @@ namespace UploadWebApi.Applicacion.Servicios
         {
 
             var huella = await _store.ReadAsync(idHuella);
-
-            ThrowIfNull("", huella);
 
             return await DownloadHuellaInternalAsync(huella);
 
@@ -232,28 +211,21 @@ namespace UploadWebApi.Applicacion.Servicios
         /// </summary>
         /// <param name="huella"></param>
         /// <returns></returns>
-        async Task<BlobDto> DownloadHuellaInternalAsync(HuellaDto huella)
+        async Task<BlobDto> DownloadHuellaInternalAsync(HuellaAceite huella)
         {
+            Stream huellaRaw = await _store.ReadHuellaRawAsync(huella.IdHuella);
 
-            byte[] huellaRaw = await _store.ReadHuellaRawAsync(huella.IdHuella);
-
-            if (!_hashService.VerifyHash(huellaRaw, huella.Hash ))
+            if (!_hashService.VerifyHash(huellaRaw, huella.Hash))
                 throw new ServiceException($"La verificación de firmas de la muestra {huella.IdMuestra} no es correcta.");
-
 
             return new BlobDto
             {
-                Raw = new MemoryStream(huellaRaw),
+                FileStream = huellaRaw,
                 NombreFichero = huella.NombreFichero,
                 Hash = huella.Hash,
             };
         }
-        
-        void ThrowIfNull(string idMuestra, HuellaDto huella)
-        {
-            if (huella == null)
-                throw new NotFoundException($"La huella de la muestra {idMuestra} no existe en el sistema o no está autorizado.");
-        }
+
 
         static string GetFormatoNombre(string nombreFichero, int idHuella)
         {
@@ -268,21 +240,20 @@ namespace UploadWebApi.Applicacion.Servicios
         /// </summary>
         /// <param name="rawHuella"></param>
         /// <param name="rutaFichero"></param>
-        static void CrearFichero(byte[] rawHuella, string rutaFichero)
+        static void CrearFichero(Stream rawHuella, string rutaFichero)
         {
             byte[] buffer = new byte[255];
 
             int leidos = 0;
             using (FileStream file = new FileStream(rutaFichero, FileMode.CreateNew, FileAccess.Write))
             {
-                using (var stream = new MemoryStream(rawHuella, false))
+
+                while ((leidos = rawHuella.Read(buffer, 0, buffer.Length)) > 0)
                 {
-                    do
-                    {
-                        leidos = stream.Read(buffer, 0, buffer.Length);
-                        file.Write(buffer, 0, leidos);
-                    } while (leidos == buffer.Length);
+                    file.Write(buffer, 0, leidos);
                 }
+
+                file.Flush();
             }
         }
         /// <summary>

@@ -9,14 +9,17 @@
 
 using System;
 using System.Configuration;
+using System.Web;
 using Autofac;
-using UploadWebApi.Applicacion;
-using UploadWebApi.Applicacion.Mapeado;
-using UploadWebApi.Applicacion.Servicios;
-using UploadWebApi.Applicacion.Stores;
-using UploadWebApi.Infraestructura.Configuracion;
+
+using UploadWebApi.Aplicacion.Mapeado;
+using UploadWebApi.Aplicacion.Servicios;
+using UploadWebApi.Aplicacion.Stores;
+using UploadWebApi.Infraestructura.Datos;
+using UploadWebApi.Infraestructura.Datos.Configuracion;
 using UploadWebApi.Infraestructura.Mapeador;
 using UploadWebApi.Infraestructura.Servicios;
+using UploadWebApi.Infraestructura.Configuracion;
 
 namespace UploadWebApi.Infraestructura.Autofac
 {
@@ -27,44 +30,26 @@ namespace UploadWebApi.Infraestructura.Autofac
     {
         protected override void Load(ContainerBuilder builder)
         {
+
+            builder.Register(c =>
+            {
+                return new IdentityService(HttpContext.Current?.GetOwinContext());
+
+            }).As<IIdentityService>()
+           .InstancePerRequest();
+
+
+
             //Configuracion de los Stores
             builder.RegisterType<StoreConfiguration>()
                 .As<IStoreConfiguration>()
                 .InstancePerRequest();
 
 
-            //filtro para comprimir huellas --FakeCompresionService/ GZipCompresionService / SevenZipCompresionService
-            //builder.RegisterType<GZipCompresionService>()
-            //    .Keyed<IFiltroCompresion>(CompresionServiceType.GZipCompresionService)
-            //    .InstancePerRequest();
-
-            //builder.RegisterType<FakeCompresionService>()
-            //.Keyed<IFiltroCompresion>(CompresionServiceType.FakeCompresionService)
-            //.InstancePerRequest();
-
-            //builder.RegisterType<SevenZipCompresionService>()
-            //.Keyed<IFiltroCompresion>(CompresionServiceType.SevenZipCompresionService)
-            //.InstancePerRequest();
-
-            //builder.Register(c =>
-            //{
-            //    CompresionServiceType compresion = (CompresionServiceType) Enum.Parse(typeof(CompresionServiceType), GetAppConfig("storeConfCompresionService", CompresionServiceType.GZipCompresionService.ToString()));
-
-            //    return new DapperHuellasStore(c.Resolve<IStoreConfiguration>(), 
-            //                            c.ResolveKeyed<IFiltroCompresion>(compresion));
-            //})
-            //.As<IHuellasStore>()
-            //.InstancePerRequest();
-
-
-            //filtro para comprimir huellas --FakeCompresionService/ GZipCompresionService / SevenZipCompresionService
-            builder.RegisterType<GZipCompresionService>()
-            .As<IFiltroCompresion>()
-            .InstancePerRequest();
 
             //Stores de huellas
-            builder.RegisterType<DapperHuellasStore>()
-                .As<IHuellasStore>()
+            builder.RegisterType<DapperHuellaAceiteStore>()
+                .As<IHuellaAceiteStore>()
                 .InstancePerRequest();
 
          

@@ -4,8 +4,9 @@ using System.Web.Http;
 using System.Web.Http.Cors;
 using System.Web.Http.Description;
 
-using UploadWebApi.Applicacion.Servicios;
-using UploadWebApi.Infraestructura.Servicios;
+using UploadWebApi.Aplicacion.Excepciones;
+using UploadWebApi.Aplicacion.Servicios;
+using UploadWebApi.Infraestructura.Datos.Excepciones;
 using UploadWebApi.Models;
 
 namespace UploadWebApi.Controllers.V1
@@ -15,12 +16,13 @@ namespace UploadWebApi.Controllers.V1
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class ContrasteController : BaseApiController
     {
-        readonly IIdentityService _identity;
         readonly ContrasteHuellasService _service;
-        public ContrasteController(ContrasteHuellasService service, IIdentityService identity)
+
+
+
+        public ContrasteController(ContrasteHuellasService service)
         {
             _service= service ?? throw new ArgumentNullException(nameof(service));
-            _identity = identity ?? throw new ArgumentNullException(nameof(identity));
         }
 
         [HttpGet]
@@ -30,10 +32,10 @@ namespace UploadWebApi.Controllers.V1
         {
             try
             {
-                var contraste = await _service.ConstrastarHuellas(idMuestra1, idMuestra2, _identity.AppIdentity);
+                var contraste = await _service.ConstrastarHuellas(idMuestra1, idMuestra2);
                 return Ok(contraste);
             }
-            catch (NotFoundException noEx)
+            catch (IdNoEncontradaException noEx)
             {
                 return BadRequest(noEx.Message);
             }

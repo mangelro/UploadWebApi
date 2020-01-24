@@ -2,7 +2,7 @@
 
 
 
-namespace UploadWebApi.Applicacion.Stores
+namespace UploadWebApi.Aplicacion.Stores
 {
     public interface IStoreConfiguration
     {

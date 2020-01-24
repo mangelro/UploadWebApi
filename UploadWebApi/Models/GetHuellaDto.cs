@@ -6,6 +6,7 @@
  */
 
 using System;
+using Newtonsoft.Json;
 
 namespace UploadWebApi.Models
 {
@@ -14,6 +15,9 @@ namespace UploadWebApi.Models
     /// </summary>
     public class GetHuellaDto
     {
+        [JsonIgnore()]
+        public int IdHuella { get; set; }
+
         public string IdMuestra { get; set; }
         public DateTime FechaAnalisis { get; set; }
         public string NombreFichero { get; set; }
@@ -21,6 +25,7 @@ namespace UploadWebApi.Models
         public Guid IdRegistrador { get; set; }
         public string NombreRegistrador { get; set; }
         public string Observaciones { get; set; }
-        //public string LinkDescarga { get; set;}
+        //
+        public string LinkDescarga { get; set;}
     }
 }

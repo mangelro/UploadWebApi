@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace UploadWebApi.Applicacion.Mapeado
+
+namespace UploadWebApi.Aplicacion.Mapeado
 {
     public interface IMapperService
     {
@@ -25,10 +22,6 @@ namespace UploadWebApi.Applicacion.Mapeado
         /// item mapeado
         /// </returns>
         TDto Map<TDomain, TDto>(TDomain domain) where TDto : class;
-
-
-
-        IEnumerable<TDto> Map<TDomain, TDto>(IEnumerable<TDomain> domain) where TDto : class;
 
     }
 }

@@ -8,10 +8,10 @@
  */
 
 using System;
-using UploadWebApi.Applicacion.Stores;
+using System.IO;
 //using SevenZip;
 
-namespace UploadWebApi.Infraestructura.Servicios
+namespace UploadWebApi.Infraestructura.Compresion
 {
     /// <summary>
     /// compresion mediante algoritmo LZMA compression and decompression
@@ -19,7 +19,7 @@ namespace UploadWebApi.Infraestructura.Servicios
     /// </summary>
     public class SevenZipCompresionService : IFiltroCompresion
     {
-        public byte[] Comprimir(byte[] rawData)
+        public Stream Comprimir(Stream rawData)
         {
             //byte[] compressed = SevenZipHelper
             //                    .Compress(rawData);
@@ -28,7 +28,7 @@ namespace UploadWebApi.Infraestructura.Servicios
             throw new NotImplementedException();
         }
 
-        public byte[] Descomprimir(byte[] compressData)
+        public Stream Descomprimir(Stream compressData)
         {
 
             throw new NotImplementedException();

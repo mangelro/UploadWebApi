@@ -7,13 +7,12 @@
  *
  */
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using AutoMapper;
-using UploadWebApi.Applicacion.Mapeado;
+
+using UploadWebApi.Aplicacion.Mapeado;
+using UploadWebApi.Aplicacion.Modelo;
 using UploadWebApi.Models;
 
 namespace UploadWebApi.Infraestructura.Mapeador
@@ -37,10 +36,10 @@ namespace UploadWebApi.Infraestructura.Mapeador
         {
             var configuration = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<HuellaDto, GetRowHuellaDto>();
+                cfg.CreateMap<HuellaAceite, GetRowHuellaDto>();
                 //.ForMember(dest => dest.FechaAnalisis, opt => opt.MapFrom(src => src.FechaHuella));
 
-                cfg.CreateMap<HuellaDto, GetHuellaDto>()
+                cfg.CreateMap<HuellaAceite, GetHuellaDto>()
                 .ForMember(dest => dest.IdRegistrador, opt => opt.MapFrom(src => src.Propietario))
                 .ForMember(dest => dest.NombreRegistrador, opt => opt.MapFrom(src => src.NombrePropietario));
 

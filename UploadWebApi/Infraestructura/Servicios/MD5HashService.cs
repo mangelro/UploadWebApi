@@ -8,11 +8,9 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UploadWebApi.Applicacion;
+using System.IO;
+
+using UploadWebApi.Aplicacion.Servicios;
 
 namespace UploadWebApi.Infraestructura.Servicios
 {
@@ -21,19 +19,20 @@ namespace UploadWebApi.Infraestructura.Servicios
     /// </summary>
     public class MD5HashService : IHashService
     {
-        public byte[] CalcularHash(byte[] buffer)
+
+        public byte[] CalcularHash(Stream file)
         {
 
             using (System.Security.Cryptography.MD5CryptoServiceProvider md5 = new System.Security.Cryptography.MD5CryptoServiceProvider())
             {
-                return md5.ComputeHash(buffer);
+                return md5.ComputeHash(file);
             }
         }
-            
+           
 
-        public bool VerifyHash(byte[] raw, string hashEsperado)
+        public bool VerifyHash(Stream file, string hashEsperado)
         {
-            string md5Actual = Convert.ToBase64String(CalcularHash(raw));
+            string md5Actual = Convert.ToBase64String(CalcularHash(file));
             return hashEsperado.Equals(md5Actual, StringComparison.InvariantCulture);
         }
     }   

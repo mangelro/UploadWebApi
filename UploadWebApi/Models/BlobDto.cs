@@ -21,7 +21,7 @@ namespace UploadWebApi.Models
     /// </summary>
     public class BlobDto
     {
-        public Stream Raw { get; set; }
+        public Stream FileStream { get; set; }
         public string Hash { get; set; }
         public string NombreFichero { get; set;}
 

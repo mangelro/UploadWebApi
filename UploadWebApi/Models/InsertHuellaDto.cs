@@ -7,7 +7,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-
+using System.IO;
 using Newtonsoft.Json;
 
 using UploadWebApi.Infraestructura.Serializacion;
@@ -33,8 +33,8 @@ namespace UploadWebApi.Models
         public string Hash { get; set; }
 
         [Required]
-        [JsonConverter(typeof(Base64ArrayConverter))]
-        public byte[] Stream { get; set; }
+        [JsonConverter(typeof(Base64StreamConverter))]
+        public Stream FileStream { get; set; }
 
 
         public string Observaciones { get; set; }

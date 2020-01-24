@@ -8,11 +8,11 @@
  */
 
 using System;
-using System.Configuration;
 using System.Web;
-using UploadWebApi.Infraestructura.Configuracion;
 
-namespace UploadWebApi.Applicacion.Servicios
+using UploadWebApi.Aplicacion.Servicios;
+
+namespace UploadWebApi.Infraestructura.Configuracion
 {
     /// <summary>
     /// 

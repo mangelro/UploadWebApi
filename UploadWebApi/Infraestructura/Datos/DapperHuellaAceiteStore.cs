@@ -7,39 +7,46 @@
  *
  */
 
-using Dapper;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
+
+using Dapper;
+
+using FundacionOlivar.Validacion;
+using FundacionOlivar.Web.Modelos;
+using UploadWebApi.Aplicacion.Excepciones;
+using UploadWebApi.Aplicacion.Modelo;
+using UploadWebApi.Aplicacion.Stores;
+using UploadWebApi.Infraestructura.Compresion;
+using UploadWebApi.Infraestructura.Datos.Excepciones;
 using UploadWebApi.Infraestructura.SqlBinaryStream;
-using UploadWebApi.Models;
 
 
 
-namespace UploadWebApi.Applicacion.Stores
+namespace UploadWebApi.Infraestructura.Datos
 {
     /// <summary>
     /// http://florianreischl.blogspot.com/2011/08/streaming-sql-server-varbinarymax-in.html
     /// </summary>
-    public class DapperHuellasStore : IHuellasStore
+    public class DapperHuellaAceiteStore : IHuellaAceiteStore
     {
 
         readonly IStoreConfiguration _config;
         readonly IFiltroCompresion _compresion;
 
-        public DapperHuellasStore(IStoreConfiguration config, IFiltroCompresion compresion)
+        public DapperHuellaAceiteStore(IStoreConfiguration config, IFiltroCompresion compresion)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _compresion= compresion ?? throw new ArgumentNullException(nameof(compresion));
         }
 
-        public async Task CreateAsync(HuellaDto huella, byte[] huellaRaw)
+        public async Task CreateAsync(HuellaAceite huella, Stream huellaRaw)
         {
 
 
@@ -101,18 +108,8 @@ namespace UploadWebApi.Applicacion.Stores
             }
         }
 
-        public async Task<Tuple<IEnumerable<HuellaDto>, int>> ReadAllAsync(int pageNumber, int pageSize, Guid idUsuario, Guid idAplicacion, OrdenListatoTipo orden = OrdenListatoTipo.DESC)
+        public async Task<Tuple<IEnumerable<HuellaAceite>, int>> ReadAllAsync(RangoPaginacion paginacion, Guid idUsuario, Guid idAplicacion, OrdenType orden = OrdenType.DESC)
         {
-
-            if (pageNumber < 1)
-                throw new ArgumentException("El número de página ha de ser mayor que 0.");
-
-            if (pageSize < 1)
-                throw new ArgumentException("El tamaño de página ha de ser mayor que cero");
-
-            int rowFrom = ((pageNumber - 1) * pageSize) + 1;
-            int rowTo = rowFrom + pageSize;
-
             StringBuilder sqlString = new StringBuilder();
             sqlString.AppendFormat(@"SELECT
                  [IdHuella]
@@ -150,20 +147,20 @@ namespace UploadWebApi.Applicacion.Stores
                     {
                         AppCliente = idAplicacion,
                         Propietario = idUsuario,
-                        RowFrom = rowFrom,
-                        RowTo = rowTo
+                        RowFrom = paginacion.From,
+                        RowTo = paginacion.To
                     }))
                 {
-                    var dtos = (await multi.ReadAsync<HuellaDto>()).ToList();
+                    var dtos = (await multi.ReadAsync<HuellaAceite>()).ToList();
 
                     int count =(await multi.ReadAsync<int>()).Last();
 
-                    return Tuple.Create<IEnumerable<HuellaDto>, int>(dtos, count);
+                    return Tuple.Create<IEnumerable<HuellaAceite>, int>(dtos, count);
                 }
             }
         }
 
-        public async Task<HuellaDto> ReadAsync(string idMuestra, Guid idUsuario, Guid idAplicacion)
+        public async Task<HuellaAceite> ReadAsync(string idMuestra, Guid idUsuario, Guid idAplicacion)
         {
             StringBuilder sqlString = new StringBuilder(@"SELECT
                   h.[IdHuella]
@@ -188,13 +185,15 @@ namespace UploadWebApi.Applicacion.Stores
             {
                 connection.Open();
 
-                var dto = await connection.QueryFirstOrDefaultAsync<HuellaDto>(sqlString.ToString(), new { IdMuestra = idMuestra, AppCliente = idAplicacion, Propietario=idUsuario });
+                var huella = await connection.QueryFirstOrDefaultAsync<HuellaAceite>(sqlString.ToString(), new { IdMuestra = idMuestra, AppCliente = idAplicacion, Propietario=idUsuario });
 
-                return dto;
+                huella.ThrowIfNull(new IdNoEncontradaException($"La Muestra {idMuestra} no existe en el sistema"));
+
+                return huella;
             }
         }
 
-        public async Task<HuellaDto> ReadAsync(int idHuella)
+        public async Task<HuellaAceite> ReadAsync(int idHuella)
         {
             StringBuilder sqlString = new StringBuilder(@"SELECT
                  h.[IdHuella]
@@ -215,9 +214,11 @@ namespace UploadWebApi.Applicacion.Stores
             {
                 connection.Open();
 
-                var dto = await connection.QueryFirstOrDefaultAsync<HuellaDto>(sqlString.ToString(), new { IdHuella = idHuella});
+                var huella = await connection.QueryFirstOrDefaultAsync<HuellaAceite>(sqlString.ToString(), new { IdHuella = idHuella});
 
-                return dto;
+                huella.ThrowIfNull(new IdNoEncontradaException($"La Huella {idHuella} no existe en el sistema"));
+
+                return huella;
             }
         }
  
@@ -245,44 +246,64 @@ namespace UploadWebApi.Applicacion.Stores
         }
 
 
-        public Task<byte[]> ReadHuellaRawAsync(int idHuella)
+
+
+
+
+        /// <summary>
+        /// Lee un fichero de huella desde el origen de datos
+        /// </summary>
+        /// <param name="idHuella"></param>
+        /// <returns></returns>
+        public Task<Stream> ReadHuellaRawAsync(int idHuella)
         {
 
             byte[] buffer = new byte[1024];
             int leidos = 0;
 
-            SqlBinaryData data = SqlBinaryData.CreateIntPrimaryKey(_config.ConnectionString, "inter_HuellasAceite", "Huella", idHuella, 128);
+            SqlBinaryData data = SqlBinaryData.CreateIntPrimaryKey(_config.ConnectionString, "inter_HuellasAceite", "Huella", idHuella, 1024);
 
             using (MemoryStream writer = new MemoryStream())
             {
                 using (var reader = data.OpenRead())
                 {
-                    do
+                    while((leidos = reader.Read(buffer, 0, buffer.Length)) > 0)
                     {
-                        leidos = reader.Read(buffer, 0, buffer.Length);
                         writer.Write(buffer, 0, leidos);
-                    } while (leidos == buffer.Length);
+                    }
                 }
-                return Task.FromResult(_compresion.Descomprimir(writer.ToArray()));
+                return Task.FromResult(_compresion.Descomprimir(writer));
             }
         }
 
-        public async Task WriteHuellaRawAsync(int idHuella, byte[] huellaRaw)
+        /// <summary>
+        /// Escribe un fichero de huella en el origen de datos
+        /// </summary>
+        /// <param name="idHuella"></param>
+        /// <param name="huellaRaw"></param>
+        /// <returns></returns>
+        public async Task WriteHuellaRawAsync(int idHuella,Stream huellaRaw)
         {
 
             SqlBinaryData data = SqlBinaryData.CreateIntPrimaryKey(_config.ConnectionString, "inter_HuellasAceite", "Huella", idHuella, 1024);
 
             byte[] buffer = new byte[1024];
             int leidos = 0;
-            using (var stream = new MemoryStream(_compresion.Comprimir(huellaRaw), false))
+
+            using (var stream = _compresion.Comprimir(huellaRaw))
             {
                 using (var writer = data.OpenWrite(true))
                 {
-                    do
-                    {
-                        leidos = stream.Read(buffer, 0, buffer.Length);
+
+                    while ((leidos = stream.Read(buffer, 0, buffer.Length)) > 0){
                         writer.Write(buffer, 0, leidos);
-                    } while (leidos == buffer.Length);
+                    }
+
+                    //do
+                    //{
+                    //    leidos = stream.Read(buffer, 0, buffer.Length);
+                    //    writer.Write(buffer, 0, leidos);
+                    //} while (leidos == buffer.Length);
                 }
             }
             await Task.CompletedTask;

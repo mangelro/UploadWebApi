@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UploadWebApi.Applicacion.Servicios
+namespace UploadWebApi.Aplicacion.Servicios
 {
     public interface IConfiguracionRegistros
     {

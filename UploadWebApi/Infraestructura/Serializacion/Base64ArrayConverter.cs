@@ -9,6 +9,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,9 +20,9 @@ namespace UploadWebApi.Infraestructura.Serializacion
     /// <summary>
     /// Convierte una cadena de texto en Base64 a un array de bytes
     /// </summary>
-    public class Base64ArrayConverter : JsonConverter<byte[]>
+    public class Base64StreamConverter : JsonConverter<Stream>
     {
-        public override byte[] ReadJson(JsonReader reader, Type objectType, byte[] existingValue, bool hasExistingValue, JsonSerializer serializer)
+        public override Stream ReadJson(JsonReader reader, Type objectType, Stream existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
 
             if (reader.TokenType == JsonToken.Null)
@@ -29,24 +30,29 @@ namespace UploadWebApi.Infraestructura.Serializacion
                 return null;
             }
 
-            byte[] data;
 
             if (reader.TokenType == JsonToken.String)
             {
-                // current token is already at base64 string
-                // unable to call ReadAsBytes so do it the old fashion way
+                byte[] buffer;
+
                 string encodedData = reader.Value.ToString();
-                data = Convert.FromBase64String(encodedData);
-                return data;
+                buffer = Convert.FromBase64String(encodedData);
+
+
+                MemoryStream stream = new MemoryStream(buffer,false);
+
+
+                return stream;
             }
 
             throw new ArgumentException();
         }
 
 
-        public override void WriteJson(JsonWriter writer, byte[] value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, Stream value, JsonSerializer serializer)
         {
-            writer.WriteRawValue(Convert.ToBase64String(value));
+            // writer.WriteRawValue(Convert.ToBase64String(value));
+            throw new NotImplementedException();
         }
     }
 }

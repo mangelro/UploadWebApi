@@ -13,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UploadWebApi.Infraestructura.Servicios
+namespace UploadWebApi.Infraestructura.Compresion
 {
     /// <summary>
     /// 

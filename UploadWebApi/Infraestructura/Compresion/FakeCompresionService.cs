@@ -8,25 +8,21 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UploadWebApi.Applicacion.Stores;
+using System.IO;
 
-namespace UploadWebApi.Infraestructura.Servicios
+namespace UploadWebApi.Infraestructura.Compresion
 {
     /// <summary>
     /// 
     /// </summary>
     public class FakeCompresionService : IFiltroCompresion
     {
-        public byte[] Comprimir(byte[] rawData)
+        public Stream Comprimir(Stream rawData)
         {
             return rawData;
         }
 
-        public byte[] Descomprimir(byte[] compressData)
+        public Stream Descomprimir(Stream compressData)
         {
             return compressData;
         }

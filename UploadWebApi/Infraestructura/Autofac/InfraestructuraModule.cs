@@ -7,15 +7,9 @@
  *
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 using Autofac;
-using UploadWebApi.Infraestructura.Servicios;
-using UploadWebApi.Infraestructura.Servicios.impl;
+
+using UploadWebApi.Infraestructura.Compresion;
 
 namespace UploadWebApi.Infraestructura.Autofac
 {
@@ -27,12 +21,37 @@ namespace UploadWebApi.Infraestructura.Autofac
         protected override void Load(ContainerBuilder builder)
         {
 
-            builder.Register(c =>
-            {
-                return new IdentityService(HttpContext.Current?.GetOwinContext());
+         
 
-            }).As<IIdentityService>()
-              .InstancePerRequest();
+            //filtro para comprimir huellas --FakeCompresionService/ GZipCompresionService / SevenZipCompresionService
+            //builder.RegisterType<GZipCompresionService>()
+            //    .Keyed<IFiltroCompresion>(CompresionServiceType.GZipCompresionService)
+            //    .InstancePerRequest();
+
+            //builder.RegisterType<FakeCompresionService>()
+            //.Keyed<IFiltroCompresion>(CompresionServiceType.FakeCompresionService)
+            //.InstancePerRequest();
+
+            //builder.RegisterType<SevenZipCompresionService>()
+            //.Keyed<IFiltroCompresion>(CompresionServiceType.SevenZipCompresionService)
+            //.InstancePerRequest();
+
+            //builder.Register(c =>
+            //{
+            //    CompresionServiceType compresion = (CompresionServiceType) Enum.Parse(typeof(CompresionServiceType), GetAppConfig("storeConfCompresionService", CompresionServiceType.GZipCompresionService.ToString()));
+
+            //    return new DapperHuellasStore(c.Resolve<IStoreConfiguration>(), 
+            //                            c.ResolveKeyed<IFiltroCompresion>(compresion));
+            //})
+            //.As<IHuellasStore>()
+            //.InstancePerRequest();
+
+
+            //filtro para comprimir huellas --FakeCompresionService/ GZipCompresionService / SevenZipCompresionService
+            builder.RegisterType<GZipCompresionService>()
+            .As<IFiltroCompresion>()
+            .InstancePerRequest();
+
         }
     }
 }

@@ -8,12 +8,9 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
-namespace UploadWebApi.Applicacion.Stores
+namespace UploadWebApi.Infraestructura.Compresion
 {
     /// <summary>
     /// 
@@ -21,9 +18,9 @@ namespace UploadWebApi.Applicacion.Stores
     public interface IFiltroCompresion
     {
 
-        byte[] Comprimir(byte[] rawData);
+        Stream Comprimir(Stream rawData);
 
 
-        byte[] Descomprimir(byte[] compressData);
+        Stream Descomprimir(Stream compressData);
     }
 }

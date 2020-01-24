@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace UploadWebApi.Infraestructura.Servicios
+namespace UploadWebApi.Aplicacion.Servicios
 {
 
     public interface IIdentityService
@@ -19,8 +19,6 @@ namespace UploadWebApi.Infraestructura.Servicios
         bool IsAuthorized(string permisoSolicitado);
 
         IReadOnlyList<string> Roles { get; }
-
-        //IList<string> Permisos { get; }
 
     }// IIdentityService
 }

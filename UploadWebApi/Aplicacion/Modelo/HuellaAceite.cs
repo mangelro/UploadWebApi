@@ -7,23 +7,33 @@
 
 using System;
 
-namespace UploadWebApi.Models
+namespace UploadWebApi.Aplicacion.Modelo
 {
     /// <summary>
     /// 
     /// </summary>
-    public class HuellaDto
+    public class HuellaAceite
     {
         public int IdHuella { get; set; }
+
         public string IdMuestra { get; set; }
+
         public DateTime FechaAnalisis { get; set; }
+
         public string NombreFichero { get; set; }
+
         public string Hash { get; set; }
+
         public Guid AppCliente { get; set; }
+
         public Guid Propietario { get; set; }
+
         public string NombrePropietario { get; set; }
+
         public DateTime? FechaBloqueo { get; set; }
+
         public string Observaciones { get; set; }
+        
         /// <summary>
         /// 
         /// </summary>

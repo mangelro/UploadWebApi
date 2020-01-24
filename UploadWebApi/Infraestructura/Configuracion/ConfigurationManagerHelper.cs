@@ -8,20 +8,10 @@
  */
 
 using System;
-using System.Collections;
-using System.Collections.Specialized;
 using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UploadWebApi.Infraestructura.Configuracion
 {
-
-
-
-
-
     /// <summary>
     /// 
     /// </summary>
