@@ -57,7 +57,7 @@ namespace UploadWebApi.Controllers
             var query = Request.RequestUri.GetComponents(UriComponents.Query, UriFormat.UriEscaped);
 
 
-            var newQuery = Regex.Replace(query, @"([?&]pageIndex)=[^?&]+", $"$1={newNumPage}");
+            var newQuery = Regex.Replace(query, @"([?&]pageNumber)=[^?&]+", $"$1={newNumPage}");
 
             return baseUrl + "?" + newQuery;
         }
@@ -71,6 +71,13 @@ namespace UploadWebApi.Controllers
         {
             var baseUrl = Request.RequestUri.GetLeftPart(UriPartial.Path);
             return $"{baseUrl}/{IdHuella.ToString()}/download";
+        }
+
+
+        protected string GetLinkDescarga(int IdHuella, string idMuestra)
+        {
+            var baseUrl = Request.RequestUri.GetLeftPart(UriPartial.Path);
+            return $"{baseUrl}/{idMuestra}/{IdHuella.ToString()}/download";
         }
     }
 }

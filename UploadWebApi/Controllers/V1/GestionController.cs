@@ -102,41 +102,41 @@ namespace UploadWebApi.Controllers.V1
             }
         }
         
-        [HttpGet]
-        [Route("{idMuestra}/download")]
-        public async Task<IHttpActionResult> Download(string idMuestra)
-        {
-            try
-            {
-                BlobDto dataStream = await _service.DownloadHuellaAsync(idMuestra);
+        //[HttpGet]
+        //[Route("{idMuestra}/download")]
+        //public async Task<IHttpActionResult> Download(string idMuestra)
+        //{
+        //    try
+        //    {
+        //        BlobDto dataStream = await _service.DownloadHuellaAsync(idMuestra);
 
 
 
-                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = new StreamContent(dataStream.FileStream)
-                };
-                response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
-                {
-                    FileName = dataStream.NombreFichero
-                };
-                response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+        //        HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
+        //        {
+        //            Content = new StreamContent(dataStream.FileStream)
+        //        };
+        //        response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+        //        {
+        //            FileName = dataStream.NombreFichero
+        //        };
+        //        response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
 
-                return ResponseMessage(response);
-            }
-            catch (ServiceException sEx)
-            {
-                return BadRequest(sEx.Message);
-            }
-            catch (IdNoEncontradaException noEx)
-            {
-                return NotFound(noEx.Message);
-            }
-            catch (Exception ex)
-            {
-                return InternalServerError(ex);
-            }
-        }
+        //        return ResponseMessage(response);
+        //    }
+        //    catch (ServiceException sEx)
+        //    {
+        //        return BadRequest(sEx.Message);
+        //    }
+        //    catch (IdNoEncontradaException noEx)
+        //    {
+        //        return NotFound(noEx.Message);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return InternalServerError(ex);
+        //    }
+        //}
         
         [HttpGet]
         [Route("{idMuestra}/{idHuella:int}/download")]
@@ -196,11 +196,18 @@ namespace UploadWebApi.Controllers.V1
 
                 var inserted = await _service.CrearRegistroHuellaAsync(dto);
 
+                inserted.LinkDescarga = GetLinkDescarga(inserted.IdHuella,inserted.IdMuestra);
+
+                //NO ESTA BIEN
                 string uri = Url.Link("GetHuellaById", new { idMuestra = dto.IdMuestra });
 
                 return Created(uri, inserted);
             }
             catch (ServiceException sEx)
+            {
+                return BadRequest(sEx.Message);
+            }
+            catch (MuestraDuplicadaException sEx)
             {
                 return BadRequest(sEx.Message);
             }

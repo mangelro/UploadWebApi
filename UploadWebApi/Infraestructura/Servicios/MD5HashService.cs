@@ -25,13 +25,18 @@ namespace UploadWebApi.Infraestructura.Servicios
 
             using (System.Security.Cryptography.MD5CryptoServiceProvider md5 = new System.Security.Cryptography.MD5CryptoServiceProvider())
             {
-                return md5.ComputeHash(file);
+
+                byte[] buffer= md5.ComputeHash(file);
+
+                file.Position = 0;
+                return buffer;
             }
         }
            
 
         public bool VerifyHash(Stream file, string hashEsperado)
         {
+
             string md5Actual = Convert.ToBase64String(CalcularHash(file));
             return hashEsperado.Equals(md5Actual, StringComparison.InvariantCulture);
         }

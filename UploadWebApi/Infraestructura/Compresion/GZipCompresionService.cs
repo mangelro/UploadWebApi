@@ -23,27 +23,29 @@ namespace UploadWebApi.Infraestructura.Compresion
 
         public Stream Comprimir(Stream rawData)
         {
-            var stream = new MemoryStream();
+            var outputStream = new MemoryStream();
 
-            using (var zipStream = new GZipStream(stream, CompressionMode.Compress))
+            using (var zipStream = new GZipStream(outputStream, CompressionMode.Compress,true))
             {
                 rawData.CopyTo(zipStream);
             }
-            stream.Flush();
+            outputStream.Flush();
+            outputStream.Position = 0;
 
-
-            return stream;
+            return outputStream;
         }
 
         public Stream Descomprimir(Stream compressData)
         {
             var outputStream = new MemoryStream();
 
+            compressData.Position = 0;
             using (var zipStream = new GZipStream(compressData, CompressionMode.Decompress))
             {
                 zipStream.CopyTo(outputStream);
             }
             outputStream.Flush();
+            outputStream.Position = 0;
 
             return outputStream;
 

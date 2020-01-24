@@ -306,6 +306,8 @@ namespace UploadWebApi.Infraestructura.Datos
                     //} while (leidos == buffer.Length);
                 }
             }
+
+            huellaRaw.Seek(0, SeekOrigin.Begin);
             await Task.CompletedTask;
         }
 

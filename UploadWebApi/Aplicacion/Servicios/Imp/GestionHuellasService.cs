@@ -225,6 +225,7 @@ namespace UploadWebApi.Aplicacion.Servicios.Imp
             if (!_hashService.VerifyHash(huellaRaw, huella.Hash))
                 throw new ServiceException($"La verificación de firmas de la muestra {huella.IdMuestra} no es correcta.");
 
+
             return new BlobDto
             {
                 FileStream = huellaRaw,

@@ -6,7 +6,6 @@ using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using UploadWebApi.Infraestructura;
-using UploadWebApi.Infraestructura.Binding;
 
 namespace UploadWebApi
 {

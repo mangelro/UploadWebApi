@@ -139,7 +139,6 @@
     <Compile Include="Infraestructura\Compresion\IFiltroCompresion.cs" />
     <Compile Include="Infraestructura\Datos\Excepciones\MuestraDuplicadaException.cs" />
     <Compile Include="Controllers\V2\UploadController.cs" />
-    <Compile Include="Infraestructura\Binding\FormMultipartEncodedMediaTypeFormatter.cs" />
     <Compile Include="Infraestructura\Configuracion\ConfigurationManagerHelper.cs" />
     <Compile Include="Infraestructura\Extensiones\IdentityServiceExtensions.cs" />
     <Compile Include="Infraestructura\Extensiones\ModelStateExtensions.cs" />
@@ -185,7 +184,6 @@
     <Compile Include="Infraestructura\SqlBinaryStream\SqlBinaryWriter.cs" />
     <Compile Include="Infraestructura\Web\CdfTempFile.cs" />
     <Compile Include="Infraestructura\Web\HttpPostedFileB64.cs" />
-    <Compile Include="Infraestructura\Web\HttpPostedFileMultipart.cs" />
     <Compile Include="Infraestructura\Web\QueryStringHelper.cs" />
     <Compile Include="Models\ContrasteDto.cs" />
     <Compile Include="Models\GetHuellaDto.cs" />
