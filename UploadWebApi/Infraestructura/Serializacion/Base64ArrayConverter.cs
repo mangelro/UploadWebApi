@@ -17,9 +17,9 @@ using Newtonsoft.Json;
 namespace UploadWebApi.Infraestructura.Serializacion
 {
     /// <summary>
-    /// Convierte una cadena dte texto en Base60 a un array de bytes
+    /// Convierte una cadena de texto en Base64 a un array de bytes
     /// </summary>
-    public class ByteArrayConverter : JsonConverter<byte[]>
+    public class Base64ArrayConverter : JsonConverter<byte[]>
     {
         public override byte[] ReadJson(JsonReader reader, Type objectType, byte[] existingValue, bool hasExistingValue, JsonSerializer serializer)
         {

@@ -135,7 +135,11 @@
     <Compile Include="Applicacion\Servicios\IConfiguracionRegistros.cs" />
     <Compile Include="Applicacion\Stores\IFiltroCompresion.cs" />
     <Compile Include="Applicacion\Stores\MuestraDuplicadaException.cs" />
+    <Compile Include="Controllers\V2\UploadController.cs" />
+    <Compile Include="Infraestructura\Binding\FormMultipartEncodedMediaTypeFormatter.cs" />
     <Compile Include="Infraestructura\Configuracion\ConfigurationManagerHelper.cs" />
+    <Compile Include="Infraestructura\Extensiones\ModelStateExtensions.cs" />
+    <Compile Include="Infraestructura\Extensiones\StreamExtensions.cs" />
     <Compile Include="Infraestructura\Filtros\ValidateModelAttribute.cs" />
     <Compile Include="Infraestructura\Mapeador\AutoMapperAdapter.cs" />
     <Compile Include="Infraestructura\netCDF\FileNetCDFNotFoundException.cs" />
@@ -144,6 +148,7 @@
     <Compile Include="Infraestructura\netCDF\FormatNetCDFException.cs" />
     <Compile Include="Infraestructura\netCDF\NetCDFException.cs" />
     <Compile Include="Infraestructura\netCDF\NetCDFParser.cs" />
+    <Compile Include="Infraestructura\Serializacion\Base64FileConverter.cs" />
     <Compile Include="Infraestructura\Servicios\CompresionServiceType.cs" />
     <Compile Include="Infraestructura\Servicios\GZipCompresionService.cs" />
     <Compile Include="Infraestructura\Servicios\SevenZipCompresionService.cs" />
@@ -158,14 +163,14 @@
     <Compile Include="App_Start\AutofacWebApiConfig.cs" />
     <Compile Include="App_Start\Startup.auth.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Controllers\V1\BaseApiController.cs" />
+    <Compile Include="Controllers\BaseApiController.cs" />
     <Compile Include="Controllers\V1\ContrasteController.cs" />
     <Compile Include="Controllers\V1\GestionController.cs" />
     <Compile Include="Infraestructura\Autofac\InfraestructuraModule.cs" />
     <Compile Include="Infraestructura\Autofac\ApplicationModule.cs" />
     <Compile Include="Infraestructura\Extensiones\IdentityExtensions.cs" />
     <Compile Include="Infraestructura\Seguridad\ClaimTypes.cs" />
-    <Compile Include="Infraestructura\Serializacion\ByteArrayConverter.cs" />
+    <Compile Include="Infraestructura\Serializacion\Base64ArrayConverter.cs" />
     <Compile Include="Infraestructura\Servicios\IIdentityService.cs" />
     <Compile Include="Infraestructura\Servicios\impl\IdentityService.cs" />
     <Compile Include="Infraestructura\SqlBinaryStream\IBinaryData.cs" />
@@ -175,6 +180,8 @@
     <Compile Include="Infraestructura\SqlBinaryStream\SqlBinaryReader.cs" />
     <Compile Include="Infraestructura\SqlBinaryStream\SqlBinaryWriter.cs" />
     <Compile Include="Infraestructura\Web\CdfTempFile.cs" />
+    <Compile Include="Infraestructura\Web\HttpPostedFileB64.cs" />
+    <Compile Include="Infraestructura\Web\HttpPostedFileMultipart.cs" />
     <Compile Include="Infraestructura\Web\QueryStringHelper.cs" />
     <Compile Include="Models\ContrasteDto.cs" />
     <Compile Include="Models\GetHuellaDto.cs" />
@@ -183,6 +190,7 @@
     <Compile Include="Models\InsertHuellaDto.cs" />
     <Compile Include="Models\BlobDto.cs" />
     <Compile Include="Models\PaginatedList.cs" />
+    <Compile Include="Models\UploadMuestraV2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>

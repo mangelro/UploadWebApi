@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Cors;
 using System.Web.Http.Description;
+
 using UploadWebApi.Applicacion.Servicios;
 using UploadWebApi.Infraestructura.Filtros;
 using UploadWebApi.Infraestructura.Servicios;
@@ -16,7 +17,8 @@ using UploadWebApi.Models;
 namespace UploadWebApi.Controllers.V1
 {
 
-    [Authorize(Roles = "administradores,laboratorios,contrastadores")]
+    //[Authorize(Roles = "administradores,laboratorios,contrastadores")]
+    [Authorize]
     [RoutePrefix("v1/gestion")]
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class GestionController : BaseApiController

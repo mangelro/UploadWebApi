@@ -1,16 +1,15 @@
 ﻿/*
- * Copyright © 2019 Fundación del Olivar
- * Todos los derechos reservados
- * Autor: Miguel A. Romera
- * Fecha: 26/06/2019 10:15:16
- */
+* Copyright © 2019 Fundación del Olivar
+* Todos los derechos reservados
+* Autor: Miguel A. Romera
+* Fecha: 26/06/2019 10:15:16
+*/
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
+
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+
 using UploadWebApi.Infraestructura.Serializacion;
 
 namespace UploadWebApi.Models
@@ -34,7 +33,7 @@ namespace UploadWebApi.Models
         public string Hash { get; set; }
 
         [Required]
-        [JsonConverter(typeof(ByteArrayConverter))]
+        [JsonConverter(typeof(Base64ArrayConverter))]
         public byte[] Stream { get; set; }
 
 

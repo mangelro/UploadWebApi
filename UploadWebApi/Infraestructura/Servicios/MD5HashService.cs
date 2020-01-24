@@ -29,12 +29,12 @@ namespace UploadWebApi.Infraestructura.Servicios
                 return md5.ComputeHash(buffer);
             }
         }
-
+            
 
         public bool VerifyHash(byte[] raw, string hashEsperado)
         {
             string md5Actual = Convert.ToBase64String(CalcularHash(raw));
             return hashEsperado.Equals(md5Actual, StringComparison.InvariantCulture);
         }
-    }
+    }   
 }

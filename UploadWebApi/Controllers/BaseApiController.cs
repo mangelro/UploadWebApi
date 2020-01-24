@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Http;
 
-namespace UploadWebApi.Controllers.V1
+namespace UploadWebApi.Controllers
 {
     public abstract class BaseApiController:ApiController
     {
