@@ -21,12 +21,12 @@ using UploadWebApi.Aplicacion.Stores;
 using UploadWebApi.Infraestructura.Web;
 using UploadWebApi.Models;
 
-namespace UploadWebApi.Aplicacion.Servicios
+namespace UploadWebApi.Aplicacion.Servicios.Imp
 {
     /// <summary>
     /// 
     /// </summary>
-    public class ContrasteHuellasService
+    public class ContrasteHuellasService : IContrasteHuellasService
     {
 
         readonly IConfiguracionRegistros _conf;

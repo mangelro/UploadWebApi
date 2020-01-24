@@ -22,12 +22,12 @@ using UploadWebApi.Aplicacion.Modelo;
 using UploadWebApi.Aplicacion.Excepciones;
 using UploadWebApi.Models;
 
-namespace UploadWebApi.Aplicacion.Servicios
+namespace UploadWebApi.Aplicacion.Servicios.Imp
 {
     /// <summary>
     /// 
     /// </summary>
-    public class GestionHuellasService
+    public class GestionHuellasService: IGestionHuellasService
     {
 
         readonly IConfiguracionRegistros _conf;
@@ -110,7 +110,7 @@ namespace UploadWebApi.Aplicacion.Servicios
             return dto;
         }
 
-        public async Task<GetHuellaDto> CrearRegistroHuellaAsync(InsertHuellaDto dto, Guid idUsuario, Guid idAplicacion)
+        public async Task<GetHuellaDto> CrearRegistroHuellaAsync(InsertHuellaDto dto)
         {
             try
             {
@@ -125,8 +125,8 @@ namespace UploadWebApi.Aplicacion.Servicios
                         IdMuestra = dto.IdMuestra,
                         NombreFichero = dto.NombreFichero,
                         FechaAnalisis = dto.FechaAnalisis,
-                        AppCliente = idAplicacion,
-                        Propietario = idUsuario,
+                        AppCliente = _identityService.AppIdentity,
+                        Propietario = _identityService.UserIdentity,
                         Hash = dto.Hash,
                         Observaciones = dto.Observaciones
                     };
@@ -153,21 +153,28 @@ namespace UploadWebApi.Aplicacion.Servicios
 
         }
 
-        public async Task BorrarRegistroHuellaAsync(string idMuestra, Guid idUSuario, Guid idAplicacion, bool forzarBorrado)
+        public async Task BorrarRegistroHuellaAsync(string idMuestra)
         {
 
             HuellaAceite huella = null;
 
+
+            bool forzarBorrado = _identityService.IsSysAdmin;
+
             try
             {
+
+
+                huella = await _store.ReadAsync(idMuestra, _identityService.UserIdentity, _identityService.AppIdentity);
+
+                if (huella.EstaBloqueada && !forzarBorrado)
+                {
+                    throw new ServiceException($"La huella {idMuestra} está bloqueada y no puede ser eliminada.");
+                }
+
+
                 using (TransactionScope tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    huella = await _store.ReadAsync(idMuestra, idUSuario, idAplicacion);
-
-                    if (huella.EstaBloqueada && !forzarBorrado)
-                    {
-                        throw new ServiceException($"La huella {idMuestra} está bloqueada y no puede ser eliminada.");
-                    }
 
                     await _store.DeleteAsync(huella.IdHuella);
 
@@ -190,9 +197,9 @@ namespace UploadWebApi.Aplicacion.Servicios
 
         }
 
-        public async Task<BlobDto> DownloadHuellaAsync(string idMuestra, Guid idApplicacion)
+        public async Task<BlobDto> DownloadHuellaAsync(string idMuestra)
         {
-            var huella = await _store.ReadAsync(idMuestra, Guid.Empty, idApplicacion);
+            var huella = await _store.ReadAsync(idMuestra, _identityService.UserIdentity, _identityService.AppIdentity);
 
             return await DownloadHuellaInternalAsync(huella);
         }

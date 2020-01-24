@@ -16,11 +16,11 @@ namespace UploadWebApi.Controllers.V1
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class ContrasteController : BaseApiController
     {
-        readonly ContrasteHuellasService _service;
+        readonly IContrasteHuellasService _service;
 
 
 
-        public ContrasteController(ContrasteHuellasService service)
+        public ContrasteController(IContrasteHuellasService  service)
         {
             _service= service ?? throw new ArgumentNullException(nameof(service));
         }

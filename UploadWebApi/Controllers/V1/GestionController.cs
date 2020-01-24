@@ -27,13 +27,11 @@ namespace UploadWebApi.Controllers.V1
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class GestionController : BaseApiController
     {
-        readonly GestionHuellasService _service;
-        readonly IIdentityService _identity;
+        readonly IGestionHuellasService _service;
 
-        public GestionController(GestionHuellasService service, IIdentityService identity)
+        public GestionController(IGestionHuellasService service)
         {
             _service = service ?? throw new ArgumentNullException(nameof(service));
-            _identity= identity ?? throw new ArgumentNullException(nameof(identity));
         }
 
         [HttpGet]
@@ -110,7 +108,7 @@ namespace UploadWebApi.Controllers.V1
         {
             try
             {
-                BlobDto dataStream = await _service.DownloadHuellaAsync(idMuestra, _identity.AppIdentity);
+                BlobDto dataStream = await _service.DownloadHuellaAsync(idMuestra);
 
 
 
@@ -196,7 +194,7 @@ namespace UploadWebApi.Controllers.V1
 
                 await _service.VerificarFichero(dto.FileStream,dto.Hash);
 
-                var inserted = await _service.CrearRegistroHuellaAsync(dto, _identity.UserIdentity, _identity.AppIdentity);
+                var inserted = await _service.CrearRegistroHuellaAsync(dto);
 
                 string uri = Url.Link("GetHuellaById", new { idMuestra = dto.IdMuestra });
 
@@ -220,14 +218,7 @@ namespace UploadWebApi.Controllers.V1
             try
             {
 
-                if (_identity.IsSysAdmin)
-                {
-                    await _service.BorrarRegistroHuellaAsync(idMuestra, Guid.Empty, _identity.AppIdentity, true);
-                }
-                else
-                {
-                    await _service.BorrarRegistroHuellaAsync(idMuestra, _identity.UserIdentity, _identity.AppIdentity, false);
-                }
+                await _service.BorrarRegistroHuellaAsync(idMuestra);
 
                 return NoContent();
             }

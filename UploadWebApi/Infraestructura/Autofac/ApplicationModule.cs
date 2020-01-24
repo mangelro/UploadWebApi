@@ -20,6 +20,7 @@ using UploadWebApi.Infraestructura.Datos.Configuracion;
 using UploadWebApi.Infraestructura.Mapeador;
 using UploadWebApi.Infraestructura.Servicios;
 using UploadWebApi.Infraestructura.Configuracion;
+using UploadWebApi.Aplicacion.Servicios.Imp;
 
 namespace UploadWebApi.Infraestructura.Autofac
 {
@@ -38,6 +39,17 @@ namespace UploadWebApi.Infraestructura.Autofac
             }).As<IIdentityService>()
            .InstancePerRequest();
 
+
+
+            //Servicio de contraste
+            builder.RegisterType<ContrasteHuellasService>()
+                .As<IContrasteHuellasService>()
+                .InstancePerRequest();
+
+            //Servicio de gestion de huellas
+            builder.RegisterType<GestionHuellasService>()
+                .As<IGestionHuellasService>()
+                .InstancePerRequest();
 
 
             //Configuracion de los Stores

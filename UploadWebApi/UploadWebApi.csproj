@@ -127,11 +127,14 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Aplicacion\Servicios\IGestionHuellasService.cs" />
+    <Compile Include="Aplicacion\Servicios\IContrasteHuellasService.cs" />
     <Compile Include="Aplicacion\Servicios\IHashService.cs" />
     <Compile Include="Aplicacion\Mapeado\IMapperService.cs" />
+    <Compile Include="Controllers\V1\MetaController.cs" />
     <Compile Include="Infraestructura\Configuracion\ConfiguracionRegistro.cs" />
-    <Compile Include="Aplicacion\Servicios\ContrasteHuellasService.cs" />
-    <Compile Include="Aplicacion\Servicios\GestionHuellasService.cs" />
+    <Compile Include="Aplicacion\Servicios\Imp\ContrasteHuellasService.cs" />
+    <Compile Include="Aplicacion\Servicios\Imp\GestionHuellasService.cs" />
     <Compile Include="Aplicacion\Servicios\IConfiguracionRegistros.cs" />
     <Compile Include="Infraestructura\Compresion\IFiltroCompresion.cs" />
     <Compile Include="Infraestructura\Datos\Excepciones\MuestraDuplicadaException.cs" />
