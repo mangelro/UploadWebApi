@@ -21,6 +21,7 @@ using UploadWebApi.Aplicacion.Stores;
 using UploadWebApi.Aplicacion.Modelo;
 using UploadWebApi.Aplicacion.Excepciones;
 using UploadWebApi.Models;
+using UploadWebApi.Infraestructura.Ficheros;
 
 namespace UploadWebApi.Aplicacion.Servicios.Imp
 {
@@ -135,12 +136,12 @@ namespace UploadWebApi.Aplicacion.Servicios.Imp
 
                     var fileuploadPath = _conf.RutaFicheros;
 
-                    CrearFichero(dto.FileStream, Path.Combine(fileuploadPath, GetFormatoNombre(dto.NombreFichero, inserted.IdHuella)));
+                    FicherosVectorHelper.GuardarFichero(dto.FileStream, Path.Combine(fileuploadPath, FicherosVectorHelper.GetFormatoNombre(dto.NombreFichero, inserted.IdHuella)));
 
                     tran.Complete();
                 }//using trans
 
-                return _mapperService.Map<HuellaAceite,GetHuellaDto>(await _store.ReadAsync(inserted.IdHuella));
+                return _mapperService.Map<HuellaAceite, GetHuellaDto>(await _store.ReadAsync(inserted.IdHuella));
             }
             catch (IOException)
             {
@@ -180,7 +181,7 @@ namespace UploadWebApi.Aplicacion.Servicios.Imp
 
                     var fileuploadPath = _conf.RutaFicheros;
 
-                    BorrarFichero(Path.Combine(fileuploadPath, GetFormatoNombre(huella.NombreFichero, huella.IdHuella)));
+                    FicherosVectorHelper.BorrarFichero(Path.Combine(fileuploadPath, FicherosVectorHelper.GetFormatoNombre(huella.NombreFichero, huella.IdHuella)));
 
                     tran.Complete();
                 }
@@ -234,57 +235,15 @@ namespace UploadWebApi.Aplicacion.Servicios.Imp
             };
         }
 
-
-        static string GetFormatoNombre(string nombreFichero, int idHuella)
-        {
-            string nombre = Path.GetFileNameWithoutExtension(nombreFichero);
-            string extension = Path.GetExtension(nombreFichero);
-
-            return $"{nombre}_{idHuella}_{extension}";
-        }
-
         /// <summary>
-        /// Crea un fichero en el sistema de archivos en la ruta establecida
+        /// 
         /// </summary>
-        /// <param name="rawHuella"></param>
-        /// <param name="rutaFichero"></param>
-        static void CrearFichero(Stream rawHuella, string rutaFichero)
-        {
-            byte[] buffer = new byte[255];
-
-            int leidos = 0;
-            using (FileStream file = new FileStream(rutaFichero, FileMode.CreateNew, FileAccess.Write))
-            {
-
-                while ((leidos = rawHuella.Read(buffer, 0, buffer.Length)) > 0)
-                {
-                    file.Write(buffer, 0, leidos);
-                }
-
-                file.Flush();
-            }
-        }
-        /// <summary>
-        /// Borra un fichero del sistema de archivos en la ruta establecida
-        /// </summary>
-        /// <param name="nombreFichero"></param>
+        /// <param name="streamVector"></param>
         /// <returns></returns>
-        static bool BorrarFichero(string rutaFichero)
+        public Task<string> CalcularHash(Stream streamVector)
         {
-
-            FileInfo file = new FileInfo(rutaFichero);
-
-            if (file.Exists)
-            {
-                file.Delete();
-                return true;
-            }
-            else
-                return false;
+            return Task.FromResult(Convert.ToBase64String(_hashService.CalcularHash(streamVector)));
         }
-
-
-
     }
 
 

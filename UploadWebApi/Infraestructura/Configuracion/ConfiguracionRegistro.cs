@@ -25,10 +25,6 @@ namespace UploadWebApi.Infraestructura.Configuracion
 
         public string RutaExeContraste => HttpContext.Current.Server.MapPath(ConfigurationManagerHelper.GetAppConfig("appConfRutaExeContraste", "~/App_Data/Contraste/ContrasteStub.exe"));
 
-
-        public double UmbralContraste => Double.Parse(ConfigurationManagerHelper.GetAppConfig("appConfUmbralContraste", "0.90"), System.Globalization.CultureInfo.InvariantCulture);
-
-
-
+        public string NombreVector => ConfigurationManagerHelper.GetAppConfig("appNombreVector", "");
     }
 }

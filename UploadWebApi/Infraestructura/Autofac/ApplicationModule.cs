@@ -52,6 +52,14 @@ namespace UploadWebApi.Infraestructura.Autofac
                 .InstancePerRequest();
 
 
+            builder.RegisterType<VectorReferenciaService>()
+            .As<IVectorReferenciaService>()
+            .InstancePerRequest();
+
+            
+
+
+
             //Configuracion de los Stores
             builder.RegisterType<StoreConfiguration>()
                 .As<IStoreConfiguration>()

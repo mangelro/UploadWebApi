@@ -18,9 +18,18 @@ namespace UploadWebApi.Models
     /// 
     /// </summary>
     public class GetRowHuellaDto
+
     {
+        [JsonIgnore()]
+        public int IdHuella { get; set; }
+
         public string IdMuestra { get; set; }
         public DateTime FechaAnalisis { get; set; }
         public string NombreFichero { get; set; }
+        public bool VectorReferencia { get; set; }
+        //
+        public string LinkDetalle { get; set; }
+
+        public string LinkDescarga { get; set; }
     }
 }

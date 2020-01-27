@@ -36,6 +36,7 @@ namespace UploadWebApi.Models
         [JsonConverter(typeof(Base64StreamConverter))]
         public Stream FileStream { get; set; }
 
+        public bool VectorReferencia { get; set; } = false;
 
         public string Observaciones { get; set; }
     }

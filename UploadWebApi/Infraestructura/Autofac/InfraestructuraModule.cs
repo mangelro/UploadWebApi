@@ -8,7 +8,10 @@
  */
 
 using Autofac;
-
+using HuellaDactilarAceite.Escritores;
+using HuellaDactilarAceite.Lectores;
+using HuellaDactilarAceite.Similitud;
+using HuellaDactilarAceite.VectoresReferencia;
 using UploadWebApi.Infraestructura.Compresion;
 
 namespace UploadWebApi.Infraestructura.Autofac
@@ -21,7 +24,7 @@ namespace UploadWebApi.Infraestructura.Autofac
         protected override void Load(ContainerBuilder builder)
         {
 
-         
+
 
             //filtro para comprimir huellas --FakeCompresionService/ GZipCompresionService / SevenZipCompresionService
             //builder.RegisterType<GZipCompresionService>()
@@ -51,6 +54,24 @@ namespace UploadWebApi.Infraestructura.Autofac
             builder.RegisterType<GZipCompresionService>()
             .As<IFiltroCompresion>()
             .InstancePerRequest();
+
+
+            builder.RegisterType<VectorReaderFactory>()
+                .As<IVectorReaderFactory>()
+                .InstancePerRequest();
+
+            builder.RegisterType<VectorWriterFactory>()
+                .As<IVectorWriterFactory>()
+                .InstancePerRequest();
+
+            builder.RegisterType<VectorReferenciaMedia>()
+                .As<IVectorReferenciaCreatorService>()
+                .InstancePerRequest();
+
+
+            builder.RegisterType<SimilitudR2>()
+                .As<IIndiceSimilitud>()
+                .InstancePerRequest();
 
         }
     }

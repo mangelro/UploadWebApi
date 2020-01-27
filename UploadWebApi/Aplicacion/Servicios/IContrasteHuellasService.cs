@@ -18,6 +18,9 @@ namespace UploadWebApi.Aplicacion.Servicios
     /// </summary>
     public interface IContrasteHuellasService
     {
+
+
         Task<ContrasteDto> ConstrastarHuellas(string idMuestra1, string idMuestra2);
+
     }
 }

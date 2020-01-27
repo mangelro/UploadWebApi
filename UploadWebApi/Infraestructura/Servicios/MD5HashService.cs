@@ -27,8 +27,8 @@ namespace UploadWebApi.Infraestructura.Servicios
             {
 
                 byte[] buffer= md5.ComputeHash(file);
+                file.Seek(0, SeekOrigin.Begin);
 
-                file.Position = 0;
                 return buffer;
             }
         }

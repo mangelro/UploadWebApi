@@ -11,14 +11,13 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-using FundacionOlivar.IO;
-using FundacionOlivar.Procesos;
 using FundacionOlivar.Validacion;
 
-using UploadWebApi.Aplicacion.Excepciones;
+using HuellaDactilarAceite.Lectores;
+using HuellaDactilarAceite.Similitud;
+
 using UploadWebApi.Aplicacion.Modelo;
 using UploadWebApi.Aplicacion.Stores;
-using UploadWebApi.Infraestructura.Web;
 using UploadWebApi.Models;
 
 namespace UploadWebApi.Aplicacion.Servicios.Imp
@@ -33,14 +32,23 @@ namespace UploadWebApi.Aplicacion.Servicios.Imp
         readonly IHuellaAceiteStore _store;
         readonly IHashService _hashService;
         readonly IIdentityService _identityService;
+        readonly IVectorReaderFactory _vectorFactory;
+        readonly IIndiceSimilitud _indice;
 
-
-        public ContrasteHuellasService(IConfiguracionRegistros config,IHuellaAceiteStore store, IHashService hashService, IIdentityService identityService)
+        public ContrasteHuellasService(
+            IConfiguracionRegistros config,
+            IHuellaAceiteStore store, 
+            IHashService hashService, 
+            IIdentityService identityService, 
+            IVectorReaderFactory vectorFactory,
+            IIndiceSimilitud indice)
         {
             _conf = config.ThrowIfNull(nameof(config));
             _store = store.ThrowIfNull(nameof(store));
             _hashService = hashService.ThrowIfNull(nameof(hashService));
             _identityService = identityService.ThrowIfNull(nameof(identityService));
+            _vectorFactory= vectorFactory.ThrowIfNull(nameof(vectorFactory));
+            _indice = indice.ThrowIfNull(nameof(indice));
         }
 
         public async Task<ContrasteDto> ConstrastarHuellas(string idMuestra1, string idMuestra2)
@@ -55,21 +63,26 @@ namespace UploadWebApi.Aplicacion.Servicios.Imp
             tConsulta1.Result.ThrowIfNull($"La Muestra {idMuestra1} no existe en el sistema.");
 
             tConsulta2.Result.ThrowIfNull($"La Muestra {idMuestra2} no existe en el sistema.");
+            
+
+            var tFichero1 = ConsultarHuellaRaw(tConsulta1.Result.IdHuella);
+
+            var tFichero2 = ConsultarHuellaRaw(tConsulta2.Result.IdHuella);
+
+
+            await Task.WhenAll(tFichero1, tFichero2);
+
+
+            IVectorReader vectorReader1 = _vectorFactory.Create(tConsulta1.Result.NombreFichero);
+            var vector1 = vectorReader1.ReadVector<double>(tFichero1.Result, _conf.NombreVector);
+
+            IVectorReader vectorReader2 = _vectorFactory.Create(tConsulta2.Result.NombreFichero);
+            var vector2 = vectorReader2.ReadVector<double>(tFichero2.Result, _conf.NombreVector);
+
 
             double indice = -1;
-            using (var tempFile1 = await CrearFicheroTemporaAsync(tConsulta1.Result.IdMuestra, tConsulta1.Result.IdHuella, tConsulta1.Result.Hash))
-            {
-                using (var tempFile2 = await CrearFicheroTemporaAsync(tConsulta2.Result.IdMuestra, tConsulta2.Result.IdHuella, tConsulta2.Result.Hash))
-                {
-                    ProcessRunner runner = new ProcessRunner(_conf.RutaExeContraste,false);
 
-                    var exitCode = runner.Run($"--id1={tempFile1.TempFileName} --id2={tempFile2.TempFileName}");
-
-                    if (exitCode == 0)
-                        indice = Double.Parse(runner.Respuesta, System.Globalization.CultureInfo.InvariantCulture);
-
-                }
-            }
+            indice=_indice.Similitud(vector1, vector2);
 
             await BloquearHuellasAsync(tConsulta1.Result.IdHuella, tConsulta2.Result.IdHuella);
 
@@ -77,13 +90,14 @@ namespace UploadWebApi.Aplicacion.Servicios.Imp
                 IdMuestra1= idMuestra1,
                 IdMuestra2= idMuestra2,
                 FechaContraste = DateTime.UtcNow,
-                UmbralAceptacion = _conf.UmbralContraste,
+                ProtocoloIndice= _indice.Protocolo,
+                UmbralAceptacion = _indice.IndiceAceptacion,
                 IndiceSimilitud = indice,
-                Estado = (indice >= _conf.UmbralContraste ? EstadoContrasteType.VALIDO : EstadoContrasteType.INVALIDO),
+                Estado = (indice >= _indice.IndiceAceptacion ? EstadoContrasteType.VALIDO : EstadoContrasteType.INVALIDO),
             };
         }
 
-        public async Task BloquearHuellasAsync(int idHuella1, int idHuella2)
+        async Task BloquearHuellasAsync(int idHuella1, int idHuella2)
         {
             DateTime ahora = DateTime.UtcNow;
 
@@ -91,25 +105,14 @@ namespace UploadWebApi.Aplicacion.Servicios.Imp
             await _store.BloquearAsync(idHuella2, ahora);
         }
 
-        async Task<HuellaAceite> ConsultarHuella(string idMuestra)
+        Task<HuellaAceite> ConsultarHuella(string idMuestra)
         {
-            return await _store.ReadAsync(idMuestra, _identityService.UserIdentity,_identityService.AppIdentity);
+            return _store.ReadAsync(idMuestra, _identityService.UserIdentity,_identityService.AppIdentity);
         }
 
-        async Task<TemporalFile> CrearFicheroTemporaAsync(string idMuestra, int idHuella, string hash)
+        Task<Stream> ConsultarHuellaRaw(int idHuella)
         {
-
-            var tempFile = new CdfTempFile(_conf.RutaTemporal);
-
-            Stream rawFile = await _store.ReadHuellaRawAsync(idHuella);
-
-            if (!_hashService.VerifyHash(rawFile, hash))
-                throw new ServiceException($"La verificación de firmas de la muestra {idMuestra} no es correcta.");
-
-            tempFile.Create(rawFile);
-
-            return tempFile;
+            return _store.ReadHuellaRawAsync(idHuella);
         }
-
     }
 }

@@ -57,14 +57,16 @@ namespace UploadWebApi.Infraestructura.Datos
                 ,[Hash]
                 ,[AppCliente]
                 ,[Propietario]
-                ,[Observaciones]) 
+                ,[Observaciones]
+                ,[VectorReferencia]) 
                  VALUES (@IdMuestra
                 ,@FechaAnalisis
                 ,@NombreFichero
                 ,@Hash
                 ,@AppCliente
                 ,@Propietario
-                ,@Observaciones);
+                ,@Observaciones
+                ,@VectorReferencia);
                 SELECT CAST(SCOPE_IDENTITY() as int)";
 
 
@@ -92,7 +94,7 @@ namespace UploadWebApi.Infraestructura.Datos
             catch (SqlException sqlEx) when (sqlEx.Number == 2627)
             {
                 //Infraccion de unique key IX_inter_HuellasAceite
-                throw new MuestraDuplicadaException($"La muestra {huella.IdMuestra} ya existe en el sistema.");
+                throw new MuestraDuplicadaException($"La Muestra '{huella.IdMuestra}' ya existe en el sistema.");
             }
         }
 
@@ -119,6 +121,7 @@ namespace UploadWebApi.Infraestructura.Datos
                 ,[Hash]
                 ,[AppCliente]
                 ,[Propietario]
+                ,[VectorReferencia]
                 FROM (SELECT *, ROW_NUMBER() over(PARTITION BY AppCliente ORDER BY FechaAnalisis {0}) RowNum 
                     FROM [inter_HuellasAceite]
                     WHERE", orden.ToString().ToUpper());
@@ -173,6 +176,7 @@ namespace UploadWebApi.Infraestructura.Datos
                 ,h.[Propietario]
                 ,h.[Observaciones]
                 ,p.[NombrePanel] NombrePropietario
+                ,h.[VectorReferencia]
                 FROM [inter_HuellasAceite] h JOIN [inter_Paneles] p ON h.Propietario=p.IdUsuario
                 WHERE h.IdMuestra=@IdMuestra AND h.AppCliente=@AppCliente");
 
@@ -206,6 +210,7 @@ namespace UploadWebApi.Infraestructura.Datos
                 ,h.[Propietario]
                 ,h.[Observaciones]
                 ,p.[NombrePanel] NombrePropietario
+                ,h.[VectorReferencia]
                 FROM [inter_HuellasAceite] h JOIN [inter_Paneles] p ON h.Propietario=p.IdUsuario
                 WHERE h.IdHuella=@IdHuella");
       

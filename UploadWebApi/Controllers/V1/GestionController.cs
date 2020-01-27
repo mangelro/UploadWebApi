@@ -45,14 +45,16 @@ namespace UploadWebApi.Controllers.V1
 
                 RangoPaginacion rangoPaginacion = new RangoPaginacion(pageNumber, pageSize);
 
-                //if (_identity.IsSysAdmin || _identity.Roles.Where(r => r == ROL_CONTRASTADOR).Any())
-                //    resul = await _service.ConsultarHuellasAsync(rangoPaginacion, _identity.AppIdentity, orden);
-                //else
-                //resul = await _service.ConsultarHuellasAsync(rangoPaginacion, _identity.UserIdentity, _identity.AppIdentity, orden);
-
                 resul = await _service.ConsultarHuellasAsync(rangoPaginacion, orden);
 
-                var paginacion = new PaginatedList<GetRowHuellaDto>(resul.Item1, pageNumber, pageSize, resul.Item2);
+                var dtos = resul.Item1.Select(h => 
+                {
+                    h.LinkDetalle= GetLinkDetalle(h.IdHuella, h.IdMuestra);
+                    h.LinkDescarga = GetLinkDescarga(h.IdHuella, h.IdMuestra);
+                    return h;
+                });
+
+                var paginacion = new PaginatedList<GetRowHuellaDto>(dtos, pageNumber, pageSize, resul.Item2);
 
                 //Link de pagina anterior
                 if (paginacion.HasPreviousPage)
@@ -85,7 +87,7 @@ namespace UploadWebApi.Controllers.V1
             try
             {
                 var huella = await _service.ConsultarHuellaAsync(idMuestra);
-                huella.LinkDescarga = GetLinkDescarga(huella.IdHuella);
+                huella.LinkDescarga = GetLinkDescarga(huella.IdHuella, huella.IdMuestra);
                 return Ok(huella);
             }
             catch (ServiceException sEx)
@@ -196,12 +198,8 @@ namespace UploadWebApi.Controllers.V1
 
                 var inserted = await _service.CrearRegistroHuellaAsync(dto);
 
-                inserted.LinkDescarga = GetLinkDescarga(inserted.IdHuella,inserted.IdMuestra);
-
-                //NO ESTA BIEN
-                string uri = Url.Link("GetHuellaById", new { idMuestra = dto.IdMuestra });
-
-                return Created(uri, inserted);
+                inserted.LinkDescarga = GetLinkDescarga(inserted.IdHuella, inserted.IdMuestra);
+                return Created(GetLinkDescarga(inserted.IdHuella, inserted.IdMuestra), inserted);
             }
             catch (ServiceException sEx)
             {

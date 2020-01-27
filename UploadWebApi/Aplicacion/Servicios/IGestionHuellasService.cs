@@ -36,8 +36,8 @@ namespace UploadWebApi.Aplicacion.Servicios
         Task<BlobDto> DownloadHuellaAsync(string idMuestra);
 
         Task<BlobDto> DownloadHuellaAsync(int idHuella);
-           
-         
+
+        Task<string> CalcularHash(Stream streamVector);
     }
 
 

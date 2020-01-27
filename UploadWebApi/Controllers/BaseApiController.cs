@@ -76,8 +76,15 @@ namespace UploadWebApi.Controllers
 
         protected string GetLinkDescarga(int IdHuella, string idMuestra)
         {
-            var baseUrl = Request.RequestUri.GetLeftPart(UriPartial.Path);
-            return $"{baseUrl}/{idMuestra}/{IdHuella.ToString()}/download";
+            var baseUrl = Request.RequestUri.GetLeftPart(UriPartial.Authority);
+            return $"{baseUrl}/v1/gestion/{idMuestra}/{IdHuella.ToString()}/download";
         }
+
+        protected string GetLinkDetalle(int IdHuella, string idMuestra)
+        {
+            var baseUrl = Request.RequestUri.GetLeftPart(UriPartial.Authority);
+            return $"{baseUrl}/v1/gestion/{idMuestra}";
+        }
+
     }
 }

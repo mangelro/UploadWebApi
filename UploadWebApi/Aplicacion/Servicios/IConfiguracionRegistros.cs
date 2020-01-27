@@ -15,7 +15,6 @@ namespace UploadWebApi.Aplicacion.Servicios
 
         string RutaExeContraste { get; }
 
-        double UmbralContraste { get; }
-
+        string NombreVector { get; }
     }
 }

@@ -32,6 +32,12 @@ namespace UploadWebApi.Aplicacion.Modelo
 
         public DateTime? FechaBloqueo { get; set; }
 
+        /// <summary>
+        /// Determina si el vector es un  vector referencia
+        /// formado por la operacion con otros vectores
+        /// </summary>
+        public bool VectorReferencia { get; set; }
+
         public string Observaciones { get; set; }
         
         /// <summary>

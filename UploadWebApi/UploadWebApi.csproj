@@ -131,6 +131,9 @@
     <Compile Include="Aplicacion\Servicios\IContrasteHuellasService.cs" />
     <Compile Include="Aplicacion\Servicios\IHashService.cs" />
     <Compile Include="Aplicacion\Mapeado\IMapperService.cs" />
+    <Compile Include="Aplicacion\Servicios\Imp\VectorReferenciaService.cs" />
+    <Compile Include="Aplicacion\Servicios\IVectorReferenciaService.cs" />
+    <Compile Include="Controllers\V1\ReferenciaController.cs" />
     <Compile Include="Controllers\V1\MetaController.cs" />
     <Compile Include="Infraestructura\Configuracion\ConfiguracionRegistro.cs" />
     <Compile Include="Aplicacion\Servicios\Imp\ContrasteHuellasService.cs" />
@@ -143,6 +146,7 @@
     <Compile Include="Infraestructura\Extensiones\IdentityServiceExtensions.cs" />
     <Compile Include="Infraestructura\Extensiones\ModelStateExtensions.cs" />
     <Compile Include="Infraestructura\Extensiones\StreamExtensions.cs" />
+    <Compile Include="Infraestructura\Ficheros\FicherosVectorHelper.cs" />
     <Compile Include="Infraestructura\Filtros\ValidateModelAttribute.cs" />
     <Compile Include="Infraestructura\Mapeador\AutoMapperAdapter.cs" />
     <Compile Include="Infraestructura\netCDF\FileNetCDFNotFoundException.cs" />
@@ -191,6 +195,7 @@
     <Compile Include="Models\GetRowHuellaDto.cs" />
     <Compile Include="Models\InsertHuellaDto.cs" />
     <Compile Include="Models\BlobDto.cs" />
+    <Compile Include="Models\InsertVectorRefencia.cs" />
     <Compile Include="Models\UploadMuestraV2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -225,6 +230,10 @@
     <ProjectReference Include="..\..\FundacionOlivar\FundacionOlivar\FundacionOlivar.csproj">
       <Project>{0092457D-6D0D-4D65-AE56-6A0473A3E955}</Project>
       <Name>FundacionOlivar</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\HuellaDactilarAceite\HuellaDactilarAceite\HuellaDactilarAceite.csproj">
+      <Project>{A1498FE5-EC33-4D65-B9C4-67616546A0F2}</Project>
+      <Name>HuellaDactilarAceite</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

@@ -33,6 +33,7 @@ namespace UploadWebApi.Models
         public DateTime FechaContraste { get; set; }
         public double IndiceSimilitud { get; set; }
         public double UmbralAceptacion { get; set; }
+        public string ProtocoloIndice { get; set; }
         public EstadoContrasteType Estado { get; set; }
     }
 }
