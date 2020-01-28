@@ -32,7 +32,7 @@ namespace UploadWebApi.Controllers.V1
         {
             try
             {
-                var contraste = await _service.ConstrastarHuellas(idMuestra1, idMuestra2);
+                var contraste = await _service.ConstrastarHuellasAsync(idMuestra1, idMuestra2);
                 return Ok(contraste);
             }
             catch (IdNoEncontradaException noEx)
@@ -51,7 +51,29 @@ namespace UploadWebApi.Controllers.V1
 
 
 
-
+        [HttpGet]
+        [Route("")]
+        [ResponseType(typeof(ContrasteDto))]
+        public async Task<IHttpActionResult> Get([FromBody] MuestrasDto muestras)
+        {
+            try
+            {
+                var contraste = await _service.ConstrastarHuellasAsync(muestras.IdMuestras);
+                 return Ok(contraste);
+            }
+            catch (IdNoEncontradaException noEx)
+            {
+                return BadRequest(noEx.Message);
+            }
+            catch (ServiceException sEx)
+            {
+                return BadRequest(sEx.Message);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
 
     }
 }

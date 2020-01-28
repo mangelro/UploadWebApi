@@ -28,12 +28,20 @@ namespace UploadWebApi.Models
     /// </summary>
     public class ContrasteDto
     {
-        public string IdMuestra1 { get; set; }
-        public string IdMuestra2 { get; set; }
+
+        public IEnumerable<ItemContrasteDto> Contrastes { get; set; }
         public DateTime FechaContraste { get; set; }
-        public double IndiceSimilitud { get; set; }
         public double UmbralAceptacion { get; set; }
         public string ProtocoloIndice { get; set; }
         public EstadoContrasteType Estado { get; set; }
     }
+
+    public class ItemContrasteDto
+    {
+        public string IdMuestra1 { get; set; }
+        public string IdMuestra2 { get; set; }
+        public double IndiceSimilitud { get; set; }
+        public EstadoContrasteType Estado { get; set; }
+    }
+
 }

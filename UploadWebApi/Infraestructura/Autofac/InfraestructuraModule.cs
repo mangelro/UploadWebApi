@@ -9,8 +9,8 @@
 
 using Autofac;
 using HuellaDactilarAceite.Escritores;
+using HuellaDactilarAceite.IndicesSimilitud;
 using HuellaDactilarAceite.Lectores;
-using HuellaDactilarAceite.Similitud;
 using HuellaDactilarAceite.VectoresReferencia;
 using UploadWebApi.Infraestructura.Compresion;
 

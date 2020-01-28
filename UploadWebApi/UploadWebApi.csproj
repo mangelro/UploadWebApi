@@ -127,12 +127,17 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Aplicacion\Modelo\EstadoContraste.cs" />
+    <Compile Include="Aplicacion\Procesadores\IProcesadorVectores.cs" />
+    <Compile Include="Aplicacion\Procesadores\Imp\ProcesadorVectorReferencia.cs" />
     <Compile Include="Aplicacion\Servicios\IGestionHuellasService.cs" />
     <Compile Include="Aplicacion\Servicios\IContrasteHuellasService.cs" />
     <Compile Include="Aplicacion\Servicios\IHashService.cs" />
     <Compile Include="Aplicacion\Mapeado\IMapperService.cs" />
     <Compile Include="Aplicacion\Servicios\Imp\VectorReferenciaService.cs" />
     <Compile Include="Aplicacion\Servicios\IVectorReferenciaService.cs" />
+    <Compile Include="Aplicacion\Validadores\Imp\ValidadorConstraste.cs" />
+    <Compile Include="Aplicacion\Validadores\IValidadorContraste.cs" />
     <Compile Include="Controllers\V1\ReferenciaController.cs" />
     <Compile Include="Controllers\V1\MetaController.cs" />
     <Compile Include="Infraestructura\Configuracion\ConfiguracionRegistro.cs" />
@@ -146,6 +151,7 @@
     <Compile Include="Infraestructura\Extensiones\IdentityServiceExtensions.cs" />
     <Compile Include="Infraestructura\Extensiones\ModelStateExtensions.cs" />
     <Compile Include="Infraestructura\Extensiones\StreamExtensions.cs" />
+    <Compile Include="Infraestructura\Extensiones\StringExtensions.cs" />
     <Compile Include="Infraestructura\Ficheros\FicherosVectorHelper.cs" />
     <Compile Include="Infraestructura\Filtros\ValidateModelAttribute.cs" />
     <Compile Include="Infraestructura\Mapeador\AutoMapperAdapter.cs" />
@@ -196,6 +202,7 @@
     <Compile Include="Models\InsertHuellaDto.cs" />
     <Compile Include="Models\BlobDto.cs" />
     <Compile Include="Models\InsertVectorRefencia.cs" />
+    <Compile Include="Models\MuestrasDto.cs" />
     <Compile Include="Models\UploadMuestraV2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">

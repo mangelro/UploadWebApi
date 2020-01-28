@@ -7,6 +7,7 @@
  *
  */
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using UploadWebApi.Models;
@@ -20,7 +21,12 @@ namespace UploadWebApi.Aplicacion.Servicios
     {
 
 
-        Task<ContrasteDto> ConstrastarHuellas(string idMuestra1, string idMuestra2);
+        Task<ContrasteDto> ConstrastarHuellasAsync(string idMuestra1, string idMuestra2);
+
+
+
+        Task<ContrasteDto> ConstrastarHuellasAsync(IEnumerable<string> muetras);
+
 
     }
 }

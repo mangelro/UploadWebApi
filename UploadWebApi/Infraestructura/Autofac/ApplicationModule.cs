@@ -21,6 +21,10 @@ using UploadWebApi.Infraestructura.Mapeador;
 using UploadWebApi.Infraestructura.Servicios;
 using UploadWebApi.Infraestructura.Configuracion;
 using UploadWebApi.Aplicacion.Servicios.Imp;
+using UploadWebApi.Aplicacion.Servicios.Procesadores.Imp;
+using UploadWebApi.Aplicacion.Servicios.Procesadores;
+using UploadWebApi.Aplicacion.Validadores.Imp;
+using UploadWebApi.Aplicacion.Validadores;
 
 namespace UploadWebApi.Infraestructura.Autofac
 {
@@ -106,6 +110,17 @@ namespace UploadWebApi.Infraestructura.Autofac
 
 
 
+            // Determina la forma en la que se procesan los vectores para su
+            // contraste
+            builder.RegisterType<ProcesadorVectorReferencia>()
+               .As<IProcesadorVectores>()
+               .InstancePerRequest();
+
+            // Determina la forma en la valida la similitud del 
+            // contraste
+            builder.RegisterType<ValidadorContraste>()
+               .As<IValidadorContraste>()
+               .InstancePerRequest();
 
         }
 
