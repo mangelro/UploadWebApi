@@ -7,9 +7,6 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Cors;
-using System.Web.Http.Description;
-
-using FundacionOlivar.Web.Modelos;
 
 using UploadWebApi.Aplicacion.Excepciones;
 using UploadWebApi.Aplicacion.Servicios;

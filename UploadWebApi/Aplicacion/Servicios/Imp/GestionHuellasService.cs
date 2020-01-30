@@ -14,7 +14,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
 using FundacionOlivar.Validacion;
-using FundacionOlivar.Web.Modelos;
 
 using UploadWebApi.Aplicacion.Mapeado;
 using UploadWebApi.Aplicacion.Stores;
@@ -22,6 +21,8 @@ using UploadWebApi.Aplicacion.Modelo;
 using UploadWebApi.Aplicacion.Excepciones;
 using UploadWebApi.Models;
 using UploadWebApi.Infraestructura.Ficheros;
+using FundacionOlivar.Modelos.ModelView;
+using UploadWebApi.Infraestructura.Datos;
 
 namespace UploadWebApi.Aplicacion.Servicios.Imp
 {
@@ -82,15 +83,15 @@ namespace UploadWebApi.Aplicacion.Servicios.Imp
             return Task.CompletedTask;
         }
 
-        public async Task<Tuple<IEnumerable<GetRowHuellaDto>, int>> ConsultarHuellasAsync(RangoPaginacion paginacion, OrdenType orden)
+        public async Task<IQueryResult<GetRowHuellaDto>> ConsultarHuellasAsync(RangoPaginacion paginacion, OrdenType orden)
         {
             try
             {
                 var huellas = await _store.ReadAllAsync(paginacion, _identityService.UserIdentity, _identityService.AppIdentity, orden);
 
-                var dtos = huellas.Item1.Select(h => _mapperService.Map<HuellaAceite, GetRowHuellaDto>(h));
+                var dtos = huellas.Items.Select(h => _mapperService.Map<HuellaAceite, GetRowHuellaDto>(h));
 
-                return Tuple.Create<IEnumerable<GetRowHuellaDto>, int>(dtos, huellas.Item2);
+                return new QueryResult<GetRowHuellaDto>(dtos, dtos.Count());
             }
             catch (ArgumentException ex)
             {

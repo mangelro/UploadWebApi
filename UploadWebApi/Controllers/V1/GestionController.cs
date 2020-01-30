@@ -8,11 +8,10 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Cors;
 using System.Web.Http.Description;
-
-using FundacionOlivar.Web.Modelos;
-
+using FundacionOlivar.Modelos.ModelView;
 using UploadWebApi.Aplicacion.Excepciones;
 using UploadWebApi.Aplicacion.Servicios;
+using UploadWebApi.Aplicacion.Stores;
 using UploadWebApi.Infraestructura.Datos.Excepciones;
 using UploadWebApi.Infraestructura.Extensiones;
 using UploadWebApi.Infraestructura.Filtros;
@@ -41,32 +40,42 @@ namespace UploadWebApi.Controllers.V1
         {
             try
             {
-                Tuple<IEnumerable<GetRowHuellaDto>, int> resul = null;
+                IQueryResult<GetRowHuellaDto> result = null;
 
                 RangoPaginacion rangoPaginacion = new RangoPaginacion(pageNumber, pageSize);
 
-                resul = await _service.ConsultarHuellasAsync(rangoPaginacion, orden);
-
-                var dtos = resul.Item1.Select(h => 
-                {
-                    h.LinkDetalle= GetLinkDetalle(h.IdHuella, h.IdMuestra);
-                    h.LinkDescarga = GetLinkDescarga(h.IdHuella, h.IdMuestra);
-                    return h;
-                });
-
-                var paginacion = new PaginatedList<GetRowHuellaDto>(dtos, pageNumber, pageSize, resul.Item2);
-
-                //Link de pagina anterior
-                if (paginacion.HasPreviousPage)
-                    paginacion.Links.PreviousPage = GetLinkNewPage(pageNumber - 1);
-
-
-                //Link de pagina siguiente
-                if (paginacion.HasNextPage)
-                    paginacion.Links.NextPage = GetLinkNewPage(pageNumber + 1);
+                result = await _service.ConsultarHuellasAsync(rangoPaginacion, orden);
 
 
 
+                var paginacion =result.AsPaginated(pageNumber, pageSize, GetLinkNewPage,(h) =>
+                 {
+                     h.LinkDetalle = GetLinkDetalle(h.IdHuella, h.IdMuestra);
+                     h.LinkDescarga = GetLinkDescarga(h.IdHuella, h.IdMuestra);
+                     return h;
+                 });
+
+
+
+
+
+                //var dtos = resul.Item1.Select(h => 
+                //{
+                //    h.LinkDetalle= GetLinkDetalle(h.IdHuella, h.IdMuestra);
+                //    h.LinkDescarga = GetLinkDescarga(h.IdHuella, h.IdMuestra);
+                //    return h;
+                //});
+
+                //var paginacion = new PaginatedList<GetRowHuellaDto>(dtos, pageNumber, pageSize, resul.Item2);
+
+                ////Link de pagina anterior
+                //if (paginacion.HasPreviousPage)
+                //    paginacion.Links.PreviousPage = GetLinkNewPage(pageNumber - 1);
+
+
+                ////Link de pagina siguiente
+                //if (paginacion.HasNextPage)
+                //    paginacion.Links.NextPage = GetLinkNewPage(pageNumber + 1);
                 return Ok(paginacion);
             }
             catch (ServiceException sEx)

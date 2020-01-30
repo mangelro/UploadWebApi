@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-
-using FundacionOlivar.Web.Modelos;
-
+using FundacionOlivar.Modelos.ModelView;
 using UploadWebApi.Aplicacion.Modelo;
 
 
@@ -15,7 +13,7 @@ namespace UploadWebApi.Aplicacion.Stores
     public interface IHuellaAceiteStore
     {
 
-        Task<Tuple<IEnumerable<HuellaAceite>, int>> ReadAllAsync(RangoPaginacion paginacion, Guid idUsuario, Guid idAplicacion, OrdenType orden);
+        Task<IQueryResult<HuellaAceite>> ReadAllAsync(RangoPaginacion paginacion, Guid idUsuario, Guid idAplicacion, OrdenType orden);
 
         Task<HuellaAceite> ReadAsync(string idMuestra, Guid idUsuario, Guid idAplicacion);
 

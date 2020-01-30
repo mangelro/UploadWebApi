@@ -27,7 +27,7 @@ namespace UploadWebApi.Controllers.V1
 
         [HttpGet]
         [Route("")]
-        [ResponseType(typeof(ContrasteDto))]
+        [ResponseType(typeof(GetContrasteDto))]
         public async Task<IHttpActionResult> Get(string idMuestra1, string idMuestra2)
         {
             try
@@ -53,7 +53,7 @@ namespace UploadWebApi.Controllers.V1
 
         [HttpGet]
         [Route("")]
-        [ResponseType(typeof(ContrasteDto))]
+        [ResponseType(typeof(GetContrasteDto))]
         public async Task<IHttpActionResult> Get([FromBody] MuestrasDto muestras)
         {
             try

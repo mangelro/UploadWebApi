@@ -26,7 +26,7 @@ namespace UploadWebApi.Models
     /// <summary>
     /// 
     /// </summary>
-    public class ContrasteDto
+    public class GetContrasteDto
     {
 
         public IEnumerable<ItemContrasteDto> Contrastes { get; set; }

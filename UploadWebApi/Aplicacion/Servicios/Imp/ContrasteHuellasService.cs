@@ -16,16 +16,15 @@ using System.Threading.Tasks;
 using FundacionOlivar.Validacion;
 
 using HuellaDactilarAceite.Lectores;
-using HuellaDactilarAceite.IndicesSimilitud;
-
-using UploadWebApi.Aplicacion.Modelo;
-using UploadWebApi.Aplicacion.Stores;
-using UploadWebApi.Models;
 using HuellaDactilarAceite.Modelo;
+
 using UploadWebApi.Aplicacion.Excepciones;
+using UploadWebApi.Aplicacion.Modelo;
 using UploadWebApi.Aplicacion.Servicios.Procesadores;
+using UploadWebApi.Aplicacion.Stores;
 using UploadWebApi.Aplicacion.Validadores;
 using UploadWebApi.Infraestructura.Extensiones;
+using UploadWebApi.Models;
 
 namespace UploadWebApi.Aplicacion.Servicios.Imp
 {
@@ -62,7 +61,7 @@ namespace UploadWebApi.Aplicacion.Servicios.Imp
             _validador = validador.ThrowIfNull(nameof(validador));
         }
 
-        public async Task<ContrasteDto> ConstrastarHuellasAsync(string idMuestra1, string idMuestra2)
+        public async Task<GetContrasteDto> ConstrastarHuellasAsync(string idMuestra1, string idMuestra2)
         {
 
             var tConsulta1 = ConsultarHuella (idMuestra1);
@@ -104,7 +103,7 @@ namespace UploadWebApi.Aplicacion.Servicios.Imp
 
             await BloquearHuellas(tConsulta1.Result.IdHuella, tConsulta2.Result.IdHuella);
 
-            var dto =new ContrasteDto {
+            var dto =new GetContrasteDto {
                 FechaContraste = DateTime.UtcNow,
                 ProtocoloIndice= _procesador.Indice.Protocolo,
                 UmbralAceptacion = (double)_procesador.Indice.UmbralAceptacion,
@@ -124,7 +123,7 @@ namespace UploadWebApi.Aplicacion.Servicios.Imp
           
         }
 
-        public async Task<ContrasteDto> ConstrastarHuellasAsync( IEnumerable<string> muestras)
+        public async Task<GetContrasteDto> ConstrastarHuellasAsync( IEnumerable<string> muestras)
         {
             try
             {
@@ -197,9 +196,9 @@ namespace UploadWebApi.Aplicacion.Servicios.Imp
 
 
 
-        ContrasteDto MapDto(IEnumerable<ItemIndice> indices)
+        GetContrasteDto MapDto(IEnumerable<ItemIndice> indices)
         {
-            var dto = new ContrasteDto
+            var dto = new GetContrasteDto
             {
                 FechaContraste = DateTime.UtcNow,
                 ProtocoloIndice = _procesador.Indice.Protocolo,

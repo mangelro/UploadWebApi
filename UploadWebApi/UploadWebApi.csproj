@@ -136,6 +136,7 @@
     <Compile Include="Aplicacion\Mapeado\IMapperService.cs" />
     <Compile Include="Aplicacion\Servicios\Imp\VectorReferenciaService.cs" />
     <Compile Include="Aplicacion\Servicios\IVectorReferenciaService.cs" />
+    <Compile Include="Aplicacion\Stores\IQueryResult.cs" />
     <Compile Include="Aplicacion\Validadores\Imp\ValidadorConstraste.cs" />
     <Compile Include="Aplicacion\Validadores\IValidadorContraste.cs" />
     <Compile Include="Controllers\V1\ReferenciaController.cs" />
@@ -148,8 +149,10 @@
     <Compile Include="Infraestructura\Datos\Excepciones\MuestraDuplicadaException.cs" />
     <Compile Include="Controllers\V2\UploadController.cs" />
     <Compile Include="Infraestructura\Configuracion\ConfigurationManagerHelper.cs" />
+    <Compile Include="Infraestructura\Datos\QueryResult.cs" />
     <Compile Include="Infraestructura\Extensiones\IdentityServiceExtensions.cs" />
     <Compile Include="Infraestructura\Extensiones\ModelStateExtensions.cs" />
+    <Compile Include="Infraestructura\Extensiones\QueryResultExtensions.cs" />
     <Compile Include="Infraestructura\Extensiones\StreamExtensions.cs" />
     <Compile Include="Infraestructura\Extensiones\StringExtensions.cs" />
     <Compile Include="Infraestructura\Ficheros\FicherosVectorHelper.cs" />
@@ -195,7 +198,7 @@
     <Compile Include="Infraestructura\Web\CdfTempFile.cs" />
     <Compile Include="Infraestructura\Web\HttpPostedFileB64.cs" />
     <Compile Include="Infraestructura\Web\QueryStringHelper.cs" />
-    <Compile Include="Models\ContrasteDto.cs" />
+    <Compile Include="Models\GetContrasteDto.cs" />
     <Compile Include="Models\GetHuellaDto.cs" />
     <Compile Include="Aplicacion\Modelo\HuellaAceite.cs" />
     <Compile Include="Models\GetRowHuellaDto.cs" />
@@ -230,12 +233,12 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\FundacionOlivar\FundacionOlivar.Web\FundacionOlivar.Web.csproj">
-      <Project>{794e492c-4b9c-4396-9167-99d424ac840a}</Project>
-      <Name>FundacionOlivar.Web</Name>
+    <ProjectReference Include="..\..\FundacionOlivar\FundacionOlivar.Modelos\FundacionOlivar.Modelos.csproj">
+      <Project>{6DB3C91E-F397-433D-8CE9-3CD087FBE16A}</Project>
+      <Name>FundacionOlivar.Modelos</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\FundacionOlivar\FundacionOlivar\FundacionOlivar.csproj">
-      <Project>{0092457D-6D0D-4D65-AE56-6A0473A3E955}</Project>
+      <Project>{0092457d-6d0d-4d65-ae56-6a0473a3e955}</Project>
       <Name>FundacionOlivar</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\HuellaDactilarAceite\HuellaDactilarAceite\HuellaDactilarAceite.csproj">

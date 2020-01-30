@@ -11,7 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using FundacionOlivar.Web.Modelos;
+using FundacionOlivar.Modelos.ModelView;
+using UploadWebApi.Aplicacion.Stores;
 using UploadWebApi.Models;
 
 namespace UploadWebApi.Aplicacion.Servicios
@@ -25,7 +26,7 @@ namespace UploadWebApi.Aplicacion.Servicios
 
         Task VerificarFichero(Stream rawFile, string hash);
 
-        Task<Tuple<IEnumerable<GetRowHuellaDto>, int>> ConsultarHuellasAsync(RangoPaginacion paginacion, OrdenType orden);
+        Task<IQueryResult<GetRowHuellaDto>> ConsultarHuellasAsync(RangoPaginacion paginacion, OrdenType orden);
 
         Task<GetHuellaDto> ConsultarHuellaAsync(string idMuestra);
 

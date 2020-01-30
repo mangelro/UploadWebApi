@@ -18,9 +18,9 @@ using System.Transactions;
 
 using Dapper;
 
+using FundacionOlivar.Modelos.ModelView;
 using FundacionOlivar.Validacion;
-using FundacionOlivar.Web.Modelos;
-using UploadWebApi.Aplicacion.Excepciones;
+
 using UploadWebApi.Aplicacion.Modelo;
 using UploadWebApi.Aplicacion.Stores;
 using UploadWebApi.Infraestructura.Compresion;
@@ -110,7 +110,7 @@ namespace UploadWebApi.Infraestructura.Datos
             }
         }
 
-        public async Task<Tuple<IEnumerable<HuellaAceite>, int>> ReadAllAsync(RangoPaginacion paginacion, Guid idUsuario, Guid idAplicacion, OrdenType orden = OrdenType.DESC)
+        public async Task<IQueryResult<HuellaAceite>> ReadAllAsync(RangoPaginacion paginacion, Guid idUsuario, Guid idAplicacion, OrdenType orden = OrdenType.DESC)
         {
             StringBuilder sqlString = new StringBuilder();
             sqlString.AppendFormat(@"SELECT
@@ -158,7 +158,7 @@ namespace UploadWebApi.Infraestructura.Datos
 
                     int count =(await multi.ReadAsync<int>()).Last();
 
-                    return Tuple.Create<IEnumerable<HuellaAceite>, int>(dtos, count);
+                    return new QueryResult<HuellaAceite>(dtos, count);
                 }
             }
         }

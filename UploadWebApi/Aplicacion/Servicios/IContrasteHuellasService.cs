@@ -21,11 +21,11 @@ namespace UploadWebApi.Aplicacion.Servicios
     {
 
 
-        Task<ContrasteDto> ConstrastarHuellasAsync(string idMuestra1, string idMuestra2);
+        Task<GetContrasteDto> ConstrastarHuellasAsync(string idMuestra1, string idMuestra2);
 
 
 
-        Task<ContrasteDto> ConstrastarHuellasAsync(IEnumerable<string> muetras);
+        Task<GetContrasteDto> ConstrastarHuellasAsync(IEnumerable<string> muetras);
 
 
     }
