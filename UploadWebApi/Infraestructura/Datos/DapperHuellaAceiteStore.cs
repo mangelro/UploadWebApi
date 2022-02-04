@@ -8,7 +8,6 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -43,7 +42,7 @@ namespace UploadWebApi.Infraestructura.Datos
         public DapperHuellaAceiteStore(IStoreConfiguration config, IFiltroCompresion compresion)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
-            _compresion= compresion ?? throw new ArgumentNullException(nameof(compresion));
+            _compresion = compresion ?? throw new ArgumentNullException(nameof(compresion));
         }
 
         public async Task CreateAsync(HuellaAceite huella, Stream huellaRaw)
@@ -128,7 +127,7 @@ namespace UploadWebApi.Infraestructura.Datos
 
             sqlString.Append(" [AppCliente] = @AppCliente");
 
-            if (idUsuario!=Guid.Empty)
+            if (idUsuario != Guid.Empty)
             {
                 sqlString.Append(" AND [Propietario]=@Propietario");
             }
@@ -156,7 +155,7 @@ namespace UploadWebApi.Infraestructura.Datos
                 {
                     var dtos = (await multi.ReadAsync<HuellaAceite>()).ToList();
 
-                    int count =(await multi.ReadAsync<int>()).Last();
+                    int count = (await multi.ReadAsync<int>()).Last();
 
                     return new QueryResult<HuellaAceite>(dtos, count);
                 }
@@ -189,7 +188,7 @@ namespace UploadWebApi.Infraestructura.Datos
             {
                 connection.Open();
 
-                var huella = await connection.QueryFirstOrDefaultAsync<HuellaAceite>(sqlString.ToString(), new { IdMuestra = idMuestra, AppCliente = idAplicacion, Propietario=idUsuario });
+                var huella = await connection.QueryFirstOrDefaultAsync<HuellaAceite>(sqlString.ToString(), new { IdMuestra = idMuestra, AppCliente = idAplicacion, Propietario = idUsuario });
 
                 huella.ThrowIfNull(new IdNoEncontradaException($"La Muestra {idMuestra} no existe en el sistema"));
 
@@ -213,27 +212,27 @@ namespace UploadWebApi.Infraestructura.Datos
                 ,h.[VectorReferencia]
                 FROM [inter_HuellasAceite] h JOIN [inter_Paneles] p ON h.Propietario=p.IdUsuario
                 WHERE h.IdHuella=@IdHuella");
-      
+
 
             using (var connection = new SqlConnection(_config.ConnectionString))
             {
                 connection.Open();
 
-                var huella = await connection.QueryFirstOrDefaultAsync<HuellaAceite>(sqlString.ToString(), new { IdHuella = idHuella});
+                var huella = await connection.QueryFirstOrDefaultAsync<HuellaAceite>(sqlString.ToString(), new { IdHuella = idHuella });
 
                 huella.ThrowIfNull(new IdNoEncontradaException($"La Huella {idHuella} no existe en el sistema"));
 
                 return huella;
             }
         }
- 
+
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="idHuella"></param>
         /// <returns></returns>
-        public async Task BloquearAsync(int idHuella,DateTime fechaBloqueo)
+        public async Task BloquearAsync(int idHuella, DateTime fechaBloqueo)
         {
             string sqlString = @"UPDATE [inter_HuellasAceite]
                                 SET [FechaBloqueo]=@Fecha,
@@ -244,7 +243,7 @@ namespace UploadWebApi.Infraestructura.Datos
             {
                 connection.Open();
 
-                await connection.ExecuteAsync(sqlString, new { IdHuella = idHuella, Fecha= fechaBloqueo });
+                await connection.ExecuteAsync(sqlString, new { IdHuella = idHuella, Fecha = fechaBloqueo });
 
             }
 
@@ -272,7 +271,7 @@ namespace UploadWebApi.Infraestructura.Datos
             {
                 using (var reader = data.OpenRead())
                 {
-                    while((leidos = reader.Read(buffer, 0, buffer.Length)) > 0)
+                    while ((leidos = reader.Read(buffer, 0, buffer.Length)) > 0)
                     {
                         writer.Write(buffer, 0, leidos);
                     }
@@ -287,7 +286,7 @@ namespace UploadWebApi.Infraestructura.Datos
         /// <param name="idHuella"></param>
         /// <param name="huellaRaw"></param>
         /// <returns></returns>
-        public async Task WriteHuellaRawAsync(int idHuella,Stream huellaRaw)
+        public async Task WriteHuellaRawAsync(int idHuella, Stream huellaRaw)
         {
 
             SqlBinaryData data = SqlBinaryData.CreateIntPrimaryKey(_config.ConnectionString, "inter_HuellasAceite", "Huella", idHuella, 1024);
@@ -300,7 +299,8 @@ namespace UploadWebApi.Infraestructura.Datos
                 using (var writer = data.OpenWrite(true))
                 {
 
-                    while ((leidos = stream.Read(buffer, 0, buffer.Length)) > 0){
+                    while ((leidos = stream.Read(buffer, 0, buffer.Length)) > 0)
+                    {
                         writer.Write(buffer, 0, leidos);
                     }
 

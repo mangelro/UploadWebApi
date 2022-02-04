@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 using System;
 using System.Threading;
 using System.Diagnostics;
+using System.Web.Http.ModelBinding;
+using System.Web.Http.ModelBinding.Binders;
+using System.Web;
+using UploadWebApi.Infraestructura.Binding;
 
 [assembly: OwinStartup(typeof(UploadWebApi.Startup))]
 namespace UploadWebApi
@@ -27,6 +31,7 @@ namespace UploadWebApi
             AutofacWebapiConfig.Initialize(configuration, app);
 
 
+
             WebApiConfig.Register(configuration);
 
 
@@ -34,6 +39,10 @@ namespace UploadWebApi
 
             //Ha de ser la última llamada
             app.UseWebApi(configuration);
+
+
+
+
         }
 
 

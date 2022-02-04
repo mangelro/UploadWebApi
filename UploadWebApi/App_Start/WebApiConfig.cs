@@ -1,11 +1,16 @@
 ﻿using System.Net.Http.Formatting;
-using System.Net.Http.Headers;
+using System.Web;
 using System.Web.Http;
-using System.Web.Http.Cors;
+using System.Web.Http.ModelBinding;
+using System.Web.Http.ModelBinding.Binders;
+
 using Microsoft.Owin.Security.OAuth;
+
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
+
 using UploadWebApi.Infraestructura;
+using UploadWebApi.Infraestructura.Binding;
 
 namespace UploadWebApi
 {
@@ -18,8 +23,10 @@ namespace UploadWebApi
 
             config.Formatters.Clear();
             config.Formatters.Add(new JsonMediaTypeFormatter());
-            //config.Formatters.Add(new FormMultipartEncodedMediaTypeFormatter());
 
+
+            config.Services.Insert(typeof(ModelBinderProvider), 0, new UploadedFilesModelBinderProvider());
+            
 
             ////De manera global serializamos los Enum como cadenas
             ////https://exceptionnotfound.net/serializing-enumerations-in-asp-net-web-api/

@@ -35,7 +35,7 @@ namespace UploadWebApi.Controllers.V1
 
         [HttpGet]
         [Route("")]
-        [ResponseType(typeof(PaginatedList<GetRowHuellaDto>))]
+        //[ResponseType(typeof(PaginatedList<GetRowHuellaDto>))]
         public async Task<IHttpActionResult> Get(int pageNumber = 1,int pageSize=10, OrdenType orden= OrdenType.DESC)
         {
             try

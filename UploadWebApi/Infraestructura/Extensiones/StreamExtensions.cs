@@ -41,5 +41,18 @@ namespace UploadWebApi.Infraestructura.Extensiones
             }
         }
 
+        public static void SaveToFile(this Stream stream, string filePath)
+        {
+            byte[] buffer = new byte[16 * 1024]; //16K
+            int leidos = 0;
+
+            using (Stream output = File.Create(filePath))
+            {
+                while ((leidos = stream.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    output.Write(buffer, 0, leidos);
+                }
+            }
+        }
     }
 }

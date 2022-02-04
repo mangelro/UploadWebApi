@@ -1,25 +1,23 @@
 ﻿using System;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+using System.Collections.Generic;
 using System.Web.Http;
 using System.Web.Http.Cors;
+using System.Web.Http.ModelBinding;
 
 using UploadWebApi.Aplicacion.Servicios;
-using UploadWebApi.Infraestructura.Extensiones;
-using UploadWebApi.Models;
+using UploadWebApi.Infraestructura;
+using UploadWebApi.Infraestructura.Binding;
 
 namespace UploadWebApi.Controllers.V2
 {
 
     /// <summary>
+    /// hola
     /// </summary>
     [RoutePrefix("v2/upload")]
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class UploadController : BaseApiController
     {
-
-
         readonly IHashService _hashService;
 
         public UploadController(IHashService hashService)
@@ -27,37 +25,50 @@ namespace UploadWebApi.Controllers.V2
             _hashService = hashService;
         }
 
+
+
         [Route("")]
-        public IHttpActionResult Post(UploadMuestraV2 upload)
+        //public IHttpActionResult Post(UploadMuestraV2 upload)
+        //public IHttpActionResult Post([ModelBinder(typeof(UploadedFilesModelBinder))] IEnumerable<IHttpPostedFile> files)
+        //public IHttpActionResult Post([ModelBinder(typeof(UploadedFilesModelBinder))] IHttpPostedFile files)
+        public IHttpActionResult Post([ModelBinder] IList<IHttpPostedFile> files)
         {
-
-            if (!ModelState.IsValid)
+            try
             {
-                var errorModel = ModelState.MensajesError();
-                var response = Request.CreateErrorResponse(HttpStatusCode.BadRequest, String.Join(",", errorModel.ToArray()));
-                return ResponseMessage(response);
+                //files.SaveAs(System.IO.Path.Combine(@"C:\uploadfiles", files.FileName));
+                return Ok();
+
             }
-
-            if (!_hashService.VerifyHash(upload.VectorDatos.InputStream, upload.Hash))
+            catch (Exception ex)
             {
-                var response = Request.CreateErrorResponse(HttpStatusCode.BadRequest, "La validación HASH es errónea");
-                return ResponseMessage(response);
+                return InternalServerError(ex);
             }
 
 
-            return Content(HttpStatusCode.OK, new
-            {
-                Status = "success",
-                upload.IdMuestra,
-                upload.FechaAnalisis,
-                upload.VectorDatos.FileName,
-                upload.VectorDatos.ContentLength,
-                upload.VectorDatos.ContentType
-            });
+            //if (!ModelState.IsValid)
+            //{
+            //    var errorModel = ModelState.MensajesError();
+            //    var response = Request.CreateErrorResponse(HttpStatusCode.BadRequest, String.Join(",", errorModel.ToArray()));
+            //    return ResponseMessage(response);
+            //}
+            //if (!_hashService.VerifyHash(upload.VectorDatos.InputStream, upload.Hash))
+            //{
+            //    var response = Request.CreateErrorResponse(HttpStatusCode.BadRequest, "La validación HASH es errónea");
+            //    return ResponseMessage(response);
+            //}
+            //return Content(HttpStatusCode.OK, new
+            //{
+            //    Status = "success",
+            //    upload.IdMuestra,
+            //    upload.FechaAnalisis,
+            //    upload.VectorDatos.FileName,
+            //    upload.VectorDatos.ContentLength,
+            //    upload.VectorDatos.ContentType
+            //});
         }
 
     }
 
 
-    
+
 }

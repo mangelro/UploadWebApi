@@ -19,10 +19,10 @@ namespace UploadWebApi.Infraestructura.Extensiones
     /// </summary>
     public static class QueryResultExtensions
     {
-        public static PaginatedList<T> AsPaginated<T>(this IQueryResult<T> result, int pageIndex, int pageSize, Func<int, string> newPageLink, Func<T,T> transformacion) where T : class
+        public static PagedList<T> AsPaginated<T>(this IQueryResult<T> result, int pageIndex, int pageSize, Func<int, string> newPageLink, Func<T,T> transformacion) where T : class
         {
                                   
-           var paginacion =new PaginatedList<T>(result.Items.Select(transformacion), pageIndex, pageSize, result.TotalCount);
+           var paginacion =new PagedList<T>(result.Items.Select(transformacion), pageIndex, pageSize, result.TotalCount);
 
             //Link de pagina anterior
             if (paginacion.HasPreviousPage)
